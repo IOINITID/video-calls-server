@@ -1,0 +1,40 @@
+{
+  "name": "video-calls-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Video Calls server - an API for Video Calls application.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IOINITID/video-calls-server.git"
+  },
+  "keywords": [
+    "JavaScript",
+    "TypeScript",
+    "React",
+    "Redux-Toolkit",
+    "GraphQL",
+    "Apollo-Client",
+    "Storybook",
+    "Emotion",
+    "Webpack",
+    "Events",
+    "Bookings"
+  ],
+  "author": "Igor Orishchenko <ioinitid@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/IOINITID/video-calls-server/issues"
+  },
+  "homepage": "https://github.com/IOINITID/video-calls-server#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.12"
+  }
+}
