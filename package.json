@@ -15,16 +15,7 @@
   },
   "keywords": [
     "JavaScript",
-    "TypeScript",
-    "React",
-    "Redux-Toolkit",
-    "GraphQL",
-    "Apollo-Client",
-    "Storybook",
-    "Emotion",
-    "Webpack",
-    "Events",
-    "Bookings"
+    "TypeScript"
   ],
   "author": "Igor Orishchenko <ioinitid@gmail.com>",
   "license": "MIT",
