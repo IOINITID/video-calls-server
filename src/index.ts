@@ -5,7 +5,7 @@ import { Server } from "socket.io";
 
 dotenv.config();
 
-const PORT = process.env.PORT || 8080;
+const PORT = Number(process.env.PORT) || 8080;
 
 const app = express();
 const server = http.createServer(app);
@@ -35,5 +35,7 @@ io.on("connection", (socket) => {
     io.to(data.to).emit("callAccepted", data.signal);
   });
 });
+
+app.get("/", (req, res) => res.status(200).json({ status: "ready" }));
 
 server.listen(PORT, () => console.log(`Server is running on port: ${PORT}`));
