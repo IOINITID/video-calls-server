@@ -15,6 +15,7 @@ const io = new Server(server, {
     methods: ["GET", "POST"],
   },
   transports: ["polling"],
+  pingInterval: 10,
 });
 
 io.on("connection", (socket) => {
