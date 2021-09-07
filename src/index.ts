@@ -6,12 +6,8 @@ import { Server } from "socket.io";
 dotenv.config();
 
 const PORT = Number(process.env.PORT) || 8080;
-const INDEX = "/index.html";
 
 const app = express();
-
-app.use((req, res) => res.sendFile(INDEX, { root: __dirname }));
-
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
@@ -19,8 +15,7 @@ const io = new Server(server, {
     // origin: "http://localhost:3000",
     methods: ["GET", "POST"],
   },
-  transports: ["polling"],
-  //   pingInterval: 10,
+  transports: ["websocket"],
 });
 
 io.on("connection", (socket) => {
@@ -44,7 +39,7 @@ io.on("connection", (socket) => {
 });
 
 app.get("/", (req, res) =>
-  res.status(200).json({ status: "ready", port: `${PORT}` })
+  res.status(200).json({ status: "ready", port: PORT })
 );
 
 server.listen(PORT, () => console.log(`Server is running on port: ${PORT}`));
