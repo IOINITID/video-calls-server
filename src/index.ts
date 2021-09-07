@@ -14,6 +14,7 @@ const io = new Server(server, {
     origin: "https://ioinitid.github.io/video-calls/",
     methods: ["GET", "POST"],
   },
+  transports: ["polling"],
 });
 
 io.on("connection", (socket) => {
