@@ -36,6 +36,8 @@ io.on("connection", (socket) => {
   });
 });
 
-app.get("/", (req, res) => res.status(200).json({ status: "ready" }));
+app.get("/", (req, res) =>
+  res.status(200).json({ status: "ready", port: `${PORT}` })
+);
 
 server.listen(PORT, () => console.log(`Server is running on port: ${PORT}`));
