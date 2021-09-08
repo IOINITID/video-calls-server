@@ -2,44 +2,47 @@ import express from "express";
 import http from "http";
 import dotenv from "dotenv";
 import { Server } from "socket.io";
+import { APPLICATION_URL } from "./constants";
+import { ServerStatus, SocketEvent } from "./enums";
 
 dotenv.config();
 
-const PORT = Number(process.env.PORT) || 8080;
+const PORT: number = Number(process.env.PORT) || 8080;
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "https://ioinitid.github.io/video-calls/",
-    // origin: "http://localhost:3000",
+    origin: APPLICATION_URL,
     methods: ["GET", "POST"],
   },
   transports: ["websocket"],
 });
 
-io.on("connection", (socket) => {
-  socket.emit("me", socket.id);
+io.on(SocketEvent.Connection, (socket) => {
+  socket.emit(SocketEvent.Me, socket.id);
 
-  socket.on("disconnect", () => {
-    socket.broadcast.emit("callEnded");
+  socket.on(SocketEvent.Disconnect, () => {
+    socket.broadcast.emit(SocketEvent.CallEnded);
   });
 
-  socket.on("callUser", (data) => {
-    io.to(data.userToCall).emit("callUser", {
+  socket.on(SocketEvent.CallUser, (data: any) => {
+    io.to(data.userToCall).emit(SocketEvent.CallUser, {
       signal: data.signalData,
       from: data.from,
       name: data.name,
     });
   });
 
-  socket.on("answerCall", (data) => {
-    io.to(data.to).emit("callAccepted", data.signal);
+  socket.on(SocketEvent.AnswerCall, (data: any) => {
+    io.to(data.to).emit(SocketEvent.CallAccepted, data.signal);
   });
 });
 
 app.get("/", (req, res) =>
-  res.status(200).json({ status: "ready", port: PORT })
+  res.status(200).json({ status: ServerStatus.Ready })
 );
 
-server.listen(PORT, () => console.log(`Server is running on port: ${PORT}`));
+server.listen(PORT, () => {
+  console.log(`Server is running on port: ${PORT}...`);
+});
