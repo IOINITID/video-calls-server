@@ -1,9 +1,9 @@
-import express from "express";
-import http from "http";
-import dotenv from "dotenv";
-import { Server } from "socket.io";
-import { APPLICATION_URL } from "./constants";
-import { ServerStatus, SocketEvent } from "./enums";
+import express from 'express';
+import http from 'http';
+import dotenv from 'dotenv';
+import { Server } from 'socket.io';
+import { APPLICATION_URL } from './constants';
+import { ServerStatus, SocketEvent } from './enums';
 
 dotenv.config();
 
@@ -14,9 +14,9 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: APPLICATION_URL,
-    methods: ["GET", "POST"],
+    methods: ['GET', 'POST'],
   },
-  transports: ["websocket"],
+  transports: ['websocket'],
 });
 
 io.on(SocketEvent.Connection, (socket) => {
@@ -39,9 +39,7 @@ io.on(SocketEvent.Connection, (socket) => {
   });
 });
 
-app.get("/", (req, res) =>
-  res.status(200).json({ status: ServerStatus.Ready })
-);
+app.get('/', (req, res) => res.status(200).json({ status: ServerStatus.Ready }));
 
 server.listen(PORT, () => {
   console.log(`Server is running on port: ${PORT}...`);

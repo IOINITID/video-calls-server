@@ -1,1 +1,1 @@
-export type ModeType = "production" | "development";
+export type ModeType = 'production' | 'development';
