@@ -4,6 +4,8 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
 import { MONGO_URL, PORT } from './constants';
+import { defaultRouter } from './router';
+import { isError } from './middlewares';
 
 dotenv.config();
 
@@ -17,6 +19,8 @@ app.use(
     origin: 'http://localhost:3000',
   })
 );
+app.use('/api', defaultRouter);
+app.use(isError);
 
 const startServer = async () => {
   try {
