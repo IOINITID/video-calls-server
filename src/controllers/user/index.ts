@@ -1,9 +1,7 @@
-import { NextFunction, Request, RequestHandler } from 'express';
+import { RequestHandler } from 'express';
 import { validationResult } from 'express-validator';
 import { CLIENT_URL } from '../../constants';
-import { UserDto } from '../../dtos';
 import { ApiError } from '../../exeptions';
-import { User } from '../../models';
 import { userService } from '../../services';
 
 class UserController {
@@ -15,7 +13,7 @@ class UserController {
         return next(ApiError.BadRequest('Ошибка при валидации.', errors.array()));
       }
 
-      const userData = await userService.registration(req.body.email, req.body.password);
+      const userData = await userService.registration(req.body.email, req.body.name, req.body.password);
 
       res.cookie('refreshToken', userData.refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
 

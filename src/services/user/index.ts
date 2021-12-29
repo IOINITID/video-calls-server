@@ -8,7 +8,7 @@ import { UserDto } from '../../dtos';
 import { ObjectId } from 'mongoose';
 
 class UserService {
-  public registration = async (email: string, password: string) => {
+  public registration = async (email: string, name: string, password: string) => {
     try {
       const candidate = await User.findOne({ email });
 
@@ -20,7 +20,7 @@ class UserService {
 
       const activationLink = nanoid();
 
-      const user = await User.create({ email, password: hashPassword, activationLink });
+      const user = await User.create({ email, name, password: hashPassword, activationLink });
 
       await mailService.sendActivationMail(email, `${API_URL}/api/activate/${activationLink}`);
 

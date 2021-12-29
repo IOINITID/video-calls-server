@@ -2,6 +2,7 @@ import { model, ObjectId, Schema } from 'mongoose';
 
 type UserModel = {
   email: string;
+  name: string;
   password: string;
   isActivated: boolean;
   activationLink: string;
@@ -18,6 +19,10 @@ const userSchema = new Schema<UserModel>(
       type: String,
       unique: true,
       required: true,
+    },
+    name: {
+      type: String,
+      default: '',
     },
     password: {
       type: String,
