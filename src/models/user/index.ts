@@ -1,4 +1,4 @@
-import { model, Schema } from 'mongoose';
+import { model, ObjectId, Schema } from 'mongoose';
 
 type UserModel = {
   email: string;
@@ -7,6 +7,9 @@ type UserModel = {
   activationLink: string;
   status: string;
   socketId: string;
+  friends: ObjectId[];
+  invites: ObjectId[];
+  waitingForApproval: ObjectId[];
 };
 
 const userSchema = new Schema<UserModel>(
@@ -35,6 +38,24 @@ const userSchema = new Schema<UserModel>(
       type: String,
       default: '',
     },
+    friends: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+      },
+    ],
+    invites: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+      },
+    ],
+    waitingForApproval: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+      },
+    ],
   },
   {
     timestamps: true,

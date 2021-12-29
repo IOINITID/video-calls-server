@@ -1,7 +1,9 @@
-import { RequestHandler } from 'express';
+import { NextFunction, Request, RequestHandler } from 'express';
 import { validationResult } from 'express-validator';
 import { CLIENT_URL } from '../../constants';
+import { UserDto } from '../../dtos';
 import { ApiError } from '../../exeptions';
+import { User } from '../../models';
 import { userService } from '../../services';
 
 class UserController {
@@ -72,6 +74,26 @@ class UserController {
   public getUsers: RequestHandler = async (req, res, next) => {
     try {
       const users = await userService.getUsers();
+
+      return res.json(users);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public addInviteToFriends: RequestHandler = async (req, res, next) => {
+    try {
+      const users = await userService.addInviteToFriends(req.body.friendId, (req as any).user.id);
+
+      return res.json(users);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public addToFriends: RequestHandler = async (req, res, next) => {
+    try {
+      const users = await userService.addToFriends(req.body.friendId, (req as any).user.id);
 
       return res.json(users);
     } catch (error) {
