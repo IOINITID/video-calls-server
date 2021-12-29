@@ -6,10 +6,20 @@ import cookieParser from 'cookie-parser';
 import { MONGO_URL, PORT } from './constants';
 import { defaultRouter } from './router';
 import { isError } from './middlewares';
+import { Server } from 'socket.io';
+import http from 'http';
+import { User } from './models';
+import { ApiError } from './exeptions';
 
 dotenv.config();
 
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: '*',
+  },
+});
 
 app.use(json());
 app.use(cookieParser());
@@ -22,11 +32,72 @@ app.use(
 app.use('/api', defaultRouter);
 app.use(isError);
 
+io.on('connection', (socket) => {
+  // ON-CONNECT - кастомное событие
+  socket.on('on-connect', async (userId: string) => {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      throw ApiError.BadRequest('Пользователь не найден.');
+    }
+
+    user.status = 'online';
+    user.socketId = socket.id;
+
+    await user?.save();
+
+    // socket.emit('on-connect'); // Отправка только себе
+    // socket.broadcast.emit('on-connect'); // Отправка всем клиентам кроме себя
+
+    io.emit('on-connect'); // Отправка всем клиентам в сети
+  });
+
+  // ON-DISCONNECT - кастомное событие
+  socket.on('on-disconnect', async (userId: string) => {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      throw ApiError.BadRequest('Пользователь не найден.');
+    }
+
+    user.status = 'offline';
+    user.socketId = '';
+
+    await user?.save();
+
+    // socket.emit('on-connect'); // Отправка только себе
+    // socket.broadcast.emit('on-connect'); // Отправка всем клиентам кроме себя
+
+    io.emit('on-disconnect'); // Отправка всем клиентам в сети
+  });
+
+  //  DISCONNECT - событие отключение одного из пользователей
+  socket.on('disconnect', async () => {
+    console.log('disconnect', socket);
+
+    const user = await User.findOne({ socketId: socket.id });
+
+    if (!user) {
+      throw ApiError.BadRequest('Пользователь не найден.');
+    }
+
+    user.status = 'offline';
+    user.socketId = '';
+
+    await user?.save();
+
+    // socket.emit('on-connect'); // Отправка только себе
+    // socket.broadcast.emit('on-connect'); // Отправка всем клиентам кроме себя
+
+    io.emit('on-disconnect'); // Отправка всем клиентам в сети
+  });
+});
+
 const startServer = async () => {
   try {
     await mongoose.connect(MONGO_URL);
 
-    app.listen(PORT, () => {
+    server.listen(PORT, () => {
       console.log(`Server start on port ${PORT}...`);
     });
   } catch (error) {

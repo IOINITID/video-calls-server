@@ -5,6 +5,8 @@ type UserModel = {
   password: string;
   isActivated: boolean;
   activationLink: string;
+  status: string;
+  socketId: string;
 };
 
 const userSchema = new Schema<UserModel>(
@@ -24,6 +26,14 @@ const userSchema = new Schema<UserModel>(
     },
     activationLink: {
       type: String,
+    },
+    status: {
+      type: String,
+      default: 'offline',
+    },
+    socketId: {
+      type: String,
+      default: '',
     },
   },
   {
