@@ -79,6 +79,26 @@ class UserController {
     }
   };
 
+  public getFriends: RequestHandler = async (req, res, next) => {
+    try {
+      const friends = await userService.getFriends((req as any).user.id);
+
+      return res.json(friends);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public getInvites: RequestHandler = async (req, res, next) => {
+    try {
+      const invites = await userService.getInvites((req as any).user.id);
+
+      return res.json(invites);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   public addInviteToFriends: RequestHandler = async (req, res, next) => {
     try {
       const users = await userService.addInviteToFriends(req.body.friendId, (req as any).user.id);

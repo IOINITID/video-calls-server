@@ -126,6 +126,48 @@ class UserService {
     }
   };
 
+  public getFriends = async (userId: string) => {
+    try {
+      const user = await User.findById(userId);
+
+      if (!user) {
+        throw ApiError.BadRequest('Пользователь не найден.');
+      }
+
+      // Нужен Promise.all для поиска всех друзей пользователя по id
+      const friends = Promise.all(
+        user.friends.map(async (friend) => {
+          return await User.findById(friend);
+        })
+      );
+
+      return friends;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  public getInvites = async (userId: string) => {
+    try {
+      const user = await User.findById(userId);
+
+      if (!user) {
+        throw ApiError.BadRequest('Пользователь не найден.');
+      }
+
+      // Нужен Promise.all для поиска приглашений в друзья по id
+      const invites = Promise.all(
+        user.invites.map(async (invite) => {
+          return await User.findById(invite);
+        })
+      );
+
+      return invites;
+    } catch (error) {
+      throw error;
+    }
+  };
+
   public addInviteToFriends = async (friendId: ObjectId, userId: ObjectId) => {
     try {
       const userToAdd = await User.findById(friendId);

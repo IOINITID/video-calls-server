@@ -91,6 +91,19 @@ io.on('connection', (socket) => {
 
     io.emit('on-disconnect'); // Отправка всем клиентам в сети
   });
+
+  // ON-ADD-INVITE-TO-FRIENDS
+  socket.on('on-add-invite-to-friends', async (userId: string) => {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      throw ApiError.BadRequest('Пользователь не найден.');
+    }
+
+    socket.to(user.socketId).emit('on-add-invite-to-friends'); // Отправка пользователю, которого добавляют в друзья
+
+    // TODO: Продолжить добавлять событие добавления в друзья
+  });
 });
 
 const startServer = async () => {
