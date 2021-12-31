@@ -111,7 +111,7 @@ class UserController {
 
   public addToFriends: RequestHandler = async (req, res, next) => {
     try {
-      const users = await userService.addToFriends(req.body.friendId, (req as any).user.id);
+      const users = await userService.addToFriends((req as any).user.id, req.body.friendId);
 
       return res.json(users);
     } catch (error) {

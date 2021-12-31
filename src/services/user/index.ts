@@ -5,7 +5,7 @@ import { nanoid } from 'nanoid';
 import { mailService, tokenService } from '..';
 import { API_URL } from '../../constants';
 import { UserDto } from '../../dtos';
-import { ObjectId } from 'mongoose';
+import { ObjectId, Types } from 'mongoose';
 
 class UserService {
   public registration = async (email: string, name: string, password: string) => {
@@ -190,6 +190,9 @@ class UserService {
 
       await user.save();
 
+      console.log('friendId', friendId);
+      console.log('userId', userId);
+
       return { userToAdd, user };
     } catch (error) {
       throw error;
@@ -204,7 +207,8 @@ class UserService {
         throw ApiError.BadRequest('Пользователь для добавления в друзья не найден.');
       }
 
-      userToAdd.invites = userToAdd.invites.filter((inviteId) => inviteId !== userId);
+      await User.updateOne({ _id: friendId }, { $pull: { invites: userId } }); // Удаляет все вхождения по id пользователя
+
       userToAdd.friends.push(userId);
 
       await userToAdd.save();
@@ -215,10 +219,14 @@ class UserService {
         throw ApiError.UnauthorizedErrors();
       }
 
-      user.waitingForApproval = user.waitingForApproval.filter((waitingId) => waitingId !== friendId);
+      await User.updateOne({ _id: userId }, { $pull: { waitingForApproval: friendId } }); // Удаляет все вхождения по id пользователя
+
       user.friends.push(friendId);
 
       await user.save();
+
+      console.log('friendId', friendId);
+      console.log('userId', userId);
 
       return { userToAdd, user };
     } catch (error) {
