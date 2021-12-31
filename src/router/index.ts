@@ -26,6 +26,8 @@ router.get('/friends', isAuthorizated, userController.getFriends);
 
 router.get('/invites', isAuthorizated, userController.getInvites);
 
+router.get('/approvals', isAuthorizated, userController.getApprovals);
+
 router.post('/add-invite-to-friends', isAuthorizated, userController.addInviteToFriends);
 
 router.post('/add-to-friends', isAuthorizated, userController.addToFriends);

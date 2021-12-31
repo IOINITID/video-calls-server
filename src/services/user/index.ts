@@ -168,6 +168,27 @@ class UserService {
     }
   };
 
+  public getApprovals = async (userId: string) => {
+    try {
+      const user = await User.findById(userId);
+
+      if (!user) {
+        throw ApiError.BadRequest('Пользователь не найден.');
+      }
+
+      // Нужен Promise.all для поиска приглашений в друзья по id
+      const approvals = Promise.all(
+        user.waitingForApproval.map(async (approval) => {
+          return await User.findById(approval);
+        })
+      );
+
+      return approvals;
+    } catch (error) {
+      throw error;
+    }
+  };
+
   public addInviteToFriends = async (friendId: ObjectId, userId: ObjectId) => {
     try {
       const userToAdd = await User.findById(friendId);

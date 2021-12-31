@@ -99,6 +99,16 @@ class UserController {
     }
   };
 
+  public getApprovals: RequestHandler = async (req, res, next) => {
+    try {
+      const approvals = await userService.getApprovals((req as any).user.id);
+
+      return res.json(approvals);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   public addInviteToFriends: RequestHandler = async (req, res, next) => {
     try {
       const users = await userService.addInviteToFriends(req.body.friendId, (req as any).user.id);
