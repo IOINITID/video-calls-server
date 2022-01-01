@@ -32,4 +32,6 @@ router.post('/add-invite-to-friends', isAuthorizated, userController.addInviteTo
 
 router.post('/add-to-friends', isAuthorizated, userController.addToFriends);
 
+router.post('/remove-from-friends', isAuthorizated, userController.removeFromFriends);
+
 export const defaultRouter = router;

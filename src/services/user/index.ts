@@ -211,9 +211,6 @@ class UserService {
 
       await user.save();
 
-      console.log('friendId', friendId);
-      console.log('userId', userId);
-
       return { userToAdd, user };
     } catch (error) {
       throw error;
@@ -246,10 +243,35 @@ class UserService {
 
       await user.save();
 
-      console.log('friendId', friendId);
-      console.log('userId', userId);
-
       return { userToAdd, user };
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  public removeFromFriends = async (friendId: ObjectId, userId: ObjectId) => {
+    try {
+      const userRemoving = await User.findById(friendId); // Пользователь который удаляет из друзей
+
+      if (!userRemoving) {
+        throw ApiError.UnauthorizedErrors();
+      }
+
+      await User.updateOne({ _id: friendId }, { $pull: { friends: userId } }); // Удаляет все вхождения по id пользователя
+
+      await userRemoving.save();
+
+      const user = await User.findById(userId); // Пользователь которого удаяляют из друзей
+
+      if (!user) {
+        throw ApiError.BadRequest('Пользователь не найден.');
+      }
+
+      await User.updateOne({ _id: userId }, { $pull: { friends: friendId } }); // Удаляет все вхождения по id пользователя
+
+      await user.save();
+
+      return { userRemoving, user };
     } catch (error) {
       throw error;
     }

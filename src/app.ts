@@ -101,7 +101,7 @@ io.on('connection', (socket) => {
     }
 
     socket.to(user.socketId).emit('on-add-invite-to-friends'); // Отправка пользователю, которого добавляют в друзья
-
+    socket.emit('on-add-invite-to-friends'); // Отправка пользователю, который добавляет в друзья
     // TODO: Продолжить добавлять событие добавления в друзья
   });
 
@@ -117,6 +117,18 @@ io.on('connection', (socket) => {
     socket.emit('on-add-to-friends'); // Отправка пользователю, который принял приглашение в друзья
 
     // TODO: Продолжить добавлять событие добавления в друзья
+  });
+
+  // ON-REMOVE-FROM-FRIENDS - удаление из пользователей (кастомное событие)
+  socket.on('on-remove-from-friends', async (userId: string) => {
+    const user = await User.findById(userId); // Пользователь которого удаляют из друзей
+
+    if (!user) {
+      throw ApiError.BadRequest('Пользователь не найден.');
+    }
+
+    socket.to(user.socketId).emit('on-remove-from-friends'); // Отправка пользователю, который которого удаляют из друзей
+    socket.emit('on-remove-from-friends'); // Отправка пользователю, который удаляет из друзей
   });
 });
 

@@ -128,6 +128,16 @@ class UserController {
       next(error);
     }
   };
+
+  public removeFromFriends: RequestHandler = async (req, res, next) => {
+    try {
+      const users = await userService.removeFromFriends((req as any).user.id, req.body.friendId);
+
+      return res.json(users);
+    } catch (error) {
+      next(error);
+    }
+  };
 }
 
 export const userController = new UserController();
