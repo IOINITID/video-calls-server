@@ -119,6 +119,16 @@ class UserController {
     }
   };
 
+  public removeInviteToFriends: RequestHandler = async (req, res, next) => {
+    try {
+      const users = await userService.removeInviteToFriends(req.body.friendId, (req as any).user.id);
+
+      return res.json(users);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   public addToFriends: RequestHandler = async (req, res, next) => {
     try {
       const users = await userService.addToFriends((req as any).user.id, req.body.friendId);

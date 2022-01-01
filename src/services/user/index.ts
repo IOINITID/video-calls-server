@@ -217,6 +217,34 @@ class UserService {
     }
   };
 
+  public removeInviteToFriends = async (friendId: ObjectId, userId: ObjectId) => {
+    try {
+      const userToAdd = await User.findById(friendId);
+
+      if (!userToAdd) {
+        throw ApiError.BadRequest('Пользователь для добавления в друзья не найден.');
+      }
+
+      await User.updateOne({ _id: friendId }, { $pull: { invites: userId } }); // Удаляет все вхождения по id пользователя
+
+      await userToAdd.save();
+
+      const user = await User.findById(userId);
+
+      if (!user) {
+        throw ApiError.UnauthorizedErrors();
+      }
+
+      await User.updateOne({ _id: userId }, { $pull: { waitingForApproval: friendId } }); // Удаляет все вхождения по id пользователя
+
+      await user.save();
+
+      return { userToAdd, user };
+    } catch (error) {
+      throw error;
+    }
+  };
+
   public addToFriends = async (friendId: ObjectId, userId: ObjectId) => {
     try {
       const userToAdd = await User.findById(friendId);

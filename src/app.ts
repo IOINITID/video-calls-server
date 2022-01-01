@@ -130,6 +130,19 @@ io.on('connection', (socket) => {
     socket.to(user.socketId).emit('on-remove-from-friends'); // Отправка пользователю, который которого удаляют из друзей
     socket.emit('on-remove-from-friends'); // Отправка пользователю, который удаляет из друзей
   });
+
+  // ON-REMOVE-INVITE-TO-FRIENDS - отклонение приглашения в друзья (кастомное событие)
+  socket.on('on-remove-invite-to-friends', async (userId: string) => {
+    // TODO: Доделать отклонение в друзья
+    const user = await User.findById(userId); // Пользователь который отклоняет приглашение в друзья
+
+    if (!user) {
+      throw ApiError.BadRequest('Пользователь не найден.');
+    }
+
+    socket.to(user.socketId).emit('on-remove-invite-to-friends'); // Отправка пользователю, который которого удаляют из друзей
+    socket.emit('on-remove-invite-to-friends'); // Отправка пользователю, который удаляет из друзей
+  });
 });
 
 const startServer = async () => {

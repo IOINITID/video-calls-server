@@ -30,6 +30,8 @@ router.get('/approvals', isAuthorizated, userController.getApprovals);
 
 router.post('/add-invite-to-friends', isAuthorizated, userController.addInviteToFriends);
 
+router.post('/remove-invite-to-friends', isAuthorizated, userController.removeInviteToFriends);
+
 router.post('/add-to-friends', isAuthorizated, userController.addToFriends);
 
 router.post('/remove-from-friends', isAuthorizated, userController.removeFromFriends);
