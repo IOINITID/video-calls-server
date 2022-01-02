@@ -225,7 +225,8 @@ class UserService {
         throw ApiError.BadRequest('Пользователь для добавления в друзья не найден.');
       }
 
-      await User.updateOne({ _id: friendId }, { $pull: { invites: userId } }); // Удаляет все вхождения по id пользователя
+      // Добавлено удаление для полей invites и waitingForApproval, так как отклонить заявку могут оба пользователя
+      await User.updateOne({ _id: friendId }, { $pull: { invites: userId, waitingForApproval: userId } }); // Удаляет все вхождения по id пользователя
 
       await userToAdd.save();
 
@@ -235,7 +236,8 @@ class UserService {
         throw ApiError.UnauthorizedErrors();
       }
 
-      await User.updateOne({ _id: userId }, { $pull: { waitingForApproval: friendId } }); // Удаляет все вхождения по id пользователя
+      // Добавлено удаление для полей invites и waitingForApproval, так как отклонить заявку могут оба пользователя
+      await User.updateOne({ _id: userId }, { $pull: { waitingForApproval: friendId, invites: friendId } }); // Удаляет все вхождения по id пользователя
 
       await user.save();
 

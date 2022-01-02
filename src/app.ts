@@ -134,6 +134,8 @@ io.on('connection', (socket) => {
   // ON-REMOVE-INVITE-TO-FRIENDS - отклонение приглашения в друзья (кастомное событие)
   socket.on('on-remove-invite-to-friends', async (userId: string) => {
     // TODO: Доделать отклонение в друзья
+    // TODO: Добавить разделение на remove-invite-to-friends и remove-waiting-for-approval
+    // TODO: Отдельное API для удаления по общему признаку
     const user = await User.findById(userId); // Пользователь который отклоняет приглашение в друзья
 
     if (!user) {
