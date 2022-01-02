@@ -145,6 +145,20 @@ io.on('connection', (socket) => {
     socket.to(user.socketId).emit('on-remove-invite-to-friends'); // Отправка пользователю, который которого удаляют из друзей
     socket.emit('on-remove-invite-to-friends'); // Отправка пользователю, который удаляет из друзей
   });
+
+  // ON-CHANNEL-JOIN - присоединение к комнате (кастомное событие)
+  socket.on('on-channel-join', async (channelId: string, userId: string) => {
+    const user = await User.findById(userId); // Пользователь который вошел в канал
+
+    if (!user) {
+      throw ApiError.BadRequest('Пользователь не найден.');
+    }
+
+    socket.join(channelId); // Присоединение пользователя к каналу
+
+    // TODO: Добавить имя пользователя в сообщение
+    io.to(channelId).emit('on-channel-join', 'User has joined'); // Отправка пользователям, которые находятся в одном канале
+  });
 });
 
 const startServer = async () => {

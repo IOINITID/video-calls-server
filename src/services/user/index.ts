@@ -5,7 +5,7 @@ import { nanoid } from 'nanoid';
 import { mailService, tokenService } from '..';
 import { API_URL } from '../../constants';
 import { UserDto } from '../../dtos';
-import { ObjectId, Types } from 'mongoose';
+import { ObjectId } from 'mongoose';
 
 class UserService {
   public registration = async (email: string, name: string, password: string) => {
