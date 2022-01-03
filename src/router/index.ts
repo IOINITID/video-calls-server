@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { body } from 'express-validator';
 import { userController } from '../controllers';
 import { isAuthorizated } from '../middlewares';
+import cors from 'cors';
 
 const router = Router();
 

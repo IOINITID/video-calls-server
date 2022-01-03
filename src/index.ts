@@ -18,6 +18,7 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: APPLICATION_URL,
+    methods: ['GET', 'POST', 'OPTIONS'],
   },
 });
 
@@ -27,6 +28,7 @@ app.use(
   cors({
     credentials: true, // Разрешает cookies
     origin: APPLICATION_URL,
+    methods: ['GET', 'POST', 'OPTIONS'],
   })
 );
 app.use('/api', defaultRouter);
