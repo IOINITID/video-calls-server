@@ -27,7 +27,6 @@ app.use(
   cors({
     credentials: true, // Разрешает cookies
     origin: APPLICATION_URL,
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
   })
 );
 app.use('/api', defaultRouter);
