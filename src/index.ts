@@ -17,8 +17,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: APPLICATION_URL,
-    methods: ['GET', 'POST'],
+    origin: '*',
   },
 });
 
@@ -27,7 +26,7 @@ app.use(cookieParser());
 app.use(
   cors({
     credentials: true, // Разрешает cookies
-    origin: APPLICATION_URL,
+    origin: '*',
   })
 );
 app.use('/api', defaultRouter);
