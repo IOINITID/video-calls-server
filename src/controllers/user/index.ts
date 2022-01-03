@@ -15,10 +15,12 @@ class UserController {
 
       const userData = await userService.registration(req.body.email, req.body.name, req.body.password);
 
+      // TODO: Разобраться с Same-Site='NONE' заголовками для установку cookie в ответе из heroku
       res.cookie('refreshToken', userData.refreshToken, {
         maxAge: 30 * 24 * 60 * 60 * 1000,
         httpOnly: true,
         sameSite: 'none',
+        secure: true,
       });
 
       return res.json(userData);
@@ -35,6 +37,7 @@ class UserController {
         maxAge: 30 * 24 * 60 * 60 * 1000,
         httpOnly: true,
         sameSite: 'none',
+        secure: true,
       });
 
       return res.json(userData);
@@ -73,6 +76,7 @@ class UserController {
         maxAge: 30 * 24 * 60 * 60 * 1000,
         httpOnly: true,
         sameSite: 'none',
+        secure: true,
       });
 
       return res.json(userData);
