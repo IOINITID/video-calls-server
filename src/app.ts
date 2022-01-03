@@ -157,7 +157,8 @@ io.on('connection', (socket) => {
     socket.join(channelId); // Присоединение пользователя к каналу
 
     // TODO: Добавить имя пользователя в сообщение
-    io.to(channelId).emit('on-channel-join', 'User has joined'); // Отправка пользователям, которые находятся в одном канале
+    socket.to(channelId).emit('on-channel-join', `${user.name} has joined.`); // Отправка пользователям, которые находятся в одном канале
+    socket.emit('on-channel-join', `${user.name} has joined.`); // Отправка пользователю, который вошел в канал
   });
 });
 
