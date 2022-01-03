@@ -3,7 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
-import { MONGO_URL, PORT } from './constants';
+import { APPLICATION_URL, MONGO_URL, PORT } from './constants';
 import { defaultRouter } from './router';
 import { isError } from './middlewares';
 import { Server } from 'socket.io';
@@ -17,7 +17,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: '*',
+    origin: APPLICATION_URL,
   },
 });
 
@@ -26,7 +26,7 @@ app.use(cookieParser());
 app.use(
   cors({
     credentials: true, // Разрешает cookies
-    origin: 'http://localhost:3000',
+    origin: APPLICATION_URL,
   })
 );
 app.use('/api', defaultRouter);
@@ -159,6 +159,34 @@ io.on('connection', (socket) => {
     // TODO: Добавить имя пользователя в сообщение
     socket.to(channelId).emit('on-channel-join', `${user.name} has joined.`); // Отправка пользователям, которые находятся в одном канале
     socket.emit('on-channel-join', `${user.name} has joined.`); // Отправка пользователю, который вошел в канал
+  });
+
+  // ON-CALL - звонок пользователю
+  socket.on('on-call', async (userId, userIdToCall, signalData) => {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      throw ApiError.BadRequest('Пользователь не найден.');
+    }
+
+    const userToCall = await User.findById(userIdToCall);
+
+    if (!userToCall) {
+      throw ApiError.BadRequest('Пользователь которому вы звоните не найден.');
+    }
+
+    socket.to(userToCall.socketId).emit('on-call', signalData, user.id);
+  });
+
+  // ON-CALL-ANSWER - принятие звонока от пользователя
+  socket.on('on-call-answer', async (signalData, userId) => {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      throw ApiError.BadRequest('Пользователь не найден.');
+    }
+
+    socket.to(user.socketId).emit('on-call-answer', signalData);
   });
 });
 
