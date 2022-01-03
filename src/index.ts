@@ -17,18 +17,17 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: '*',
+    origin: APPLICATION_URL,
   },
 });
 
 app.use(json());
 app.use(cookieParser());
-app.use(
-  cors({
-    credentials: true, // Разрешает cookies
-    origin: '*',
-  })
-);
+app.use(cors());
+// {
+//   credentials: true, // Разрешает cookies
+//   origin: APPLICATION_URL,
+// }
 app.use('/api', defaultRouter);
 app.use(isError);
 
