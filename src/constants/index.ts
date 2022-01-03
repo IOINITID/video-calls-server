@@ -5,7 +5,8 @@ dotenv.config();
 
 const Mode: ModeType = 'production';
 
-export const APPLICATION_URL = Mode === 'production' ? 'https://ioinitid.github.io' : 'http://localhost:3000';
+export const APPLICATION_URL =
+  Mode === 'production' ? 'https://ioinitid.github.io/video-calls' : 'http://localhost:3000';
 
 export const PORT = process.env.PORT || 8080;
 export const MONGO_USER = process.env.MONGO_USER;
