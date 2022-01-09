@@ -1,11 +1,6 @@
 import dotenv from 'dotenv';
-import { ModeType } from '../types';
 
 dotenv.config();
-
-const Mode: ModeType = 'production';
-
-export const APPLICATION_URL = Mode === 'production' ? 'https://ioinitid.github.io' : 'http://localhost:3000';
 
 export const PORT = process.env.PORT || 8080;
 export const MONGO_USER = process.env.MONGO_USER;
@@ -21,3 +16,4 @@ export const SMTP_PASSWORD: string = process.env.SMTP_PASSWORD || '';
 export const JWT_SECRET: string = process.env.JWT_SECRET || '';
 export const JWT_ACCESS_SECRET: string = process.env.JWT_ACCESS_SECRET || '';
 export const JWT_REFRESH_SECRET: string = process.env.JWT_REFRESH_SECRET || '';
+export const CORS_ORIGIN: string = process.env.CORS_ORIGIN || '';

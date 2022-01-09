@@ -3,7 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
-import { APPLICATION_URL, MONGO_URL, PORT } from './constants';
+import { CORS_ORIGIN, MONGO_URL, PORT } from './constants';
 import { defaultRouter } from './router';
 import { isError } from './middlewares';
 import { Server } from 'socket.io';
@@ -17,7 +17,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: APPLICATION_URL,
+    origin: CORS_ORIGIN,
   },
 });
 
@@ -26,7 +26,7 @@ app.use(cookieParser());
 app.use(
   cors({
     credentials: true, // Разрешает cookies
-    origin: APPLICATION_URL,
+    origin: CORS_ORIGIN,
   })
 );
 app.use('/api', defaultRouter);

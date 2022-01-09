@@ -2,7 +2,7 @@ import express from 'express';
 import http from 'http';
 import dotenv from 'dotenv';
 import { Server } from 'socket.io';
-import { APPLICATION_URL } from './constants';
+import { CORS_ORIGIN } from './constants';
 import { ServerStatus, SocketEvent } from './enums';
 
 dotenv.config();
@@ -13,7 +13,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: APPLICATION_URL,
+    origin: CORS_ORIGIN,
     methods: ['GET', 'POST'],
   },
   transports: ['websocket'],
