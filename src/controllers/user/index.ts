@@ -177,7 +177,7 @@ class UserController {
 
   public getChannels: RequestHandler = async (req, res, next) => {
     try {
-      const channels = await userService.getChannels(req.params.type);
+      const channels = await userService.getChannels(req.body.type);
 
       return res.json(channels);
     } catch (error) {
