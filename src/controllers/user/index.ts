@@ -164,6 +164,26 @@ class UserController {
       next(error);
     }
   };
+
+  public addChannel: RequestHandler = async (req, res, next) => {
+    try {
+      const channel = await userService.addChannel(req.body.title, req.body.type);
+
+      return res.json(channel);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public getChannels: RequestHandler = async (req, res, next) => {
+    try {
+      const channels = await userService.getChannels(req.params.type);
+
+      return res.json(channels);
+    } catch (error) {
+      next(error);
+    }
+  };
 }
 
 export const userController = new UserController();

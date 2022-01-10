@@ -37,4 +37,8 @@ router.post('/add-to-friends', isAuthorizated, userController.addToFriends);
 
 router.post('/remove-from-friends', isAuthorizated, userController.removeFromFriends);
 
+router.post('/add-channel', isAuthorizated, userController.addChannel);
+
+router.post('/get-channels', isAuthorizated, userController.getChannels);
+
 export const defaultRouter = router;

@@ -1,5 +1,5 @@
 import { ApiError } from '../../exeptions';
-import { User } from '../../models';
+import { Channel, User } from '../../models';
 import bcrypt from 'bcrypt';
 import { nanoid } from 'nanoid';
 import { mailService, tokenService } from '..';
@@ -302,6 +302,36 @@ class UserService {
       await user.save();
 
       return { userRemoving, user };
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  public addChannel = async (title: string, type: string) => {
+    try {
+      const isChannel = await Channel.findOne({ title });
+
+      if (isChannel) {
+        throw ApiError.BadRequest('Такой канал уже существует.');
+      }
+
+      const channel = await Channel.create({ title, type });
+
+      return { channel };
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  public getChannels = async (type: string) => {
+    try {
+      const channels = await Channel.find({ type });
+
+      if (!channels) {
+        return { channels: [] };
+      }
+
+      return { channels };
     } catch (error) {
       throw error;
     }
