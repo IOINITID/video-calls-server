@@ -8,7 +8,7 @@ import { defaultRouter } from './router';
 import { isError } from './middlewares';
 import { Server } from 'socket.io';
 import http from 'http';
-import { User } from './models';
+import { Channel, Message, User } from './models';
 import { ApiError } from './exeptions';
 
 dotenv.config();
@@ -186,8 +186,31 @@ io.on('connection', (socket) => {
       socket.join(channelId); // Присоединение пользователя к каналу
 
       // TODO: Добавить имя пользователя в сообщение
-      socket.to(channelId).emit('on-channel-join', `${user.name} has joined.`); // Отправка пользователям, которые находятся в одном канале
-      socket.emit('on-channel-join', `${user.name} has joined.`); // Отправка пользователю, который вошел в канал
+      socket.to(channelId).emit('on-channel-join', `Пользователь ${user.name} присоединился к каналу.`); // Отправка пользователям, которые находятся в одном канале
+      socket.emit('on-channel-join', `Пользователь ${user.name} присоединился к каналу.`); // Отправка пользователю, который вошел в канал
+    } catch (error) {
+      console.log(error);
+    }
+  });
+
+  // ON-MESSAGE - отправка сообщения в канал (кастомное событие)
+  socket.on('on-message', async (channelId: string, userMessage: string, userId: string) => {
+    try {
+      const channel = await Channel.findById(channelId);
+
+      if (!channel) {
+        throw ApiError.BadRequest('Такого канала нет.');
+      }
+
+      const message = await Message.create({ text: userMessage, author: userId });
+
+      // Добавляет id модели сообщения в канал
+      channel.messages.push(message._id);
+
+      await channel.save();
+
+      socket.to(channelId).emit('on-message', channelId); // Отправка пользователям которые находятся в канале
+      socket.emit('on-message', channelId); //  Отправка пользователю который отправил сообщение
     } catch (error) {
       console.log(error);
     }

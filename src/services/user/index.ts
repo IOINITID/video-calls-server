@@ -1,5 +1,5 @@
 import { ApiError } from '../../exeptions';
-import { Channel, User } from '../../models';
+import { Channel, Message, User } from '../../models';
 import bcrypt from 'bcrypt';
 import { nanoid } from 'nanoid';
 import { mailService, tokenService } from '..';
@@ -323,15 +323,52 @@ class UserService {
     }
   };
 
-  public getChannels = async (type: string) => {
+  public getChannels = async () => {
     try {
-      const channels = await Channel.find({ type });
+      const channels = await Channel.find();
 
-      if (!channels) {
-        return { channels: [] };
+      return channels;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  public addMessageToChannel = async (channelId: string, userId: string, userMessage: string) => {
+    try {
+      const channel = await Channel.findById(channelId);
+
+      if (!channel) {
+        throw ApiError.BadRequest('Такого канала нет.');
       }
 
-      return { channels };
+      const message = await Message.create({ text: userMessage, author: userId });
+
+      // Добавляет id модели сообщения в канал
+      channel.messages.push(message._id);
+
+      await channel.save();
+
+      return message;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  public getChannelMessages = async (channelId: string) => {
+    try {
+      const channel = await Channel.findById(channelId);
+
+      if (!channel) {
+        throw ApiError.BadRequest('Такого канала нет.');
+      }
+
+      const messages = Promise.all(
+        channel.messages.map(async (messageId) => {
+          return await Message.findById(messageId);
+        })
+      );
+
+      return messages;
     } catch (error) {
       throw error;
     }

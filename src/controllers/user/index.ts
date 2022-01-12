@@ -177,9 +177,29 @@ class UserController {
 
   public getChannels: RequestHandler = async (req, res, next) => {
     try {
-      const channels = await userService.getChannels(req.body.type);
+      const channels = await userService.getChannels();
 
       return res.json(channels);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public addMessageToChannel: RequestHandler = async (req, res, next) => {
+    try {
+      const message = await userService.addMessageToChannel(req.body.channel, (req as any).user.id, req.body.message);
+
+      return res.json(message);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public getChannelMessages: RequestHandler = async (req, res, next) => {
+    try {
+      const messages = await userService.getChannelMessages(req.body.channel);
+
+      return res.json(messages);
     } catch (error) {
       next(error);
     }
