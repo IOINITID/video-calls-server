@@ -10,6 +10,7 @@ import { Server } from 'socket.io';
 import http from 'http';
 import { Channel, Message, User } from './models';
 import { ApiError } from './exeptions';
+import { UserDto } from './dtos';
 
 dotenv.config();
 
@@ -202,7 +203,15 @@ io.on('connection', (socket) => {
         throw ApiError.BadRequest('Такого канала нет.');
       }
 
-      const message = await Message.create({ text: userMessage, author: userId });
+      const user = await User.findById(userId);
+
+      if (!user) {
+        throw ApiError.BadRequest('Такого пользователя нет.');
+      }
+
+      const userDto = new UserDto(user);
+
+      const message = await Message.create({ text: userMessage, author: userDto });
 
       // Добавляет id модели сообщения в канал
       channel.messages.push(message._id);

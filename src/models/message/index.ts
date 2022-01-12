@@ -2,7 +2,12 @@ import { model, ObjectId, Schema } from 'mongoose';
 
 type MessageModel = {
   text: string;
-  author: ObjectId;
+  author: {
+    _id: string;
+    email: string;
+    name: string;
+    status: string;
+  };
   created: Date;
   isRead: boolean;
 };
@@ -11,8 +16,10 @@ const messageSchema = new Schema<MessageModel>(
   {
     text: String,
     author: {
-      type: Schema.Types.ObjectId,
-      ref: 'User',
+      _id: String,
+      email: String,
+      name: String,
+      status: String,
     },
     created: {
       type: Date,
