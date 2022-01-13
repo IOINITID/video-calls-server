@@ -5,6 +5,14 @@ import { ApiError } from '../../exeptions';
 import { userService } from '../../services';
 
 class UserController {
+  public serverLoading: RequestHandler = async (req, res, next) => {
+    try {
+      return res.json({ status: 'online' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
   public registration: RequestHandler = async (req, res, next) => {
     try {
       const errors = validationResult(req);
