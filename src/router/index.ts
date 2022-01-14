@@ -5,7 +5,7 @@ import { isAuthorizated } from '../middlewares';
 
 const router = Router();
 
-router.get('/', userController.serverLoading);
+router.get('/server-loading', userController.serverLoading);
 
 router.post(
   '/registration',
