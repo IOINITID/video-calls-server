@@ -11,6 +11,14 @@ import http from 'http';
 import { Channel, Message, User } from './models';
 import { ApiError } from './exeptions';
 import { UserDto } from './dtos';
+import {
+  disconnectSocket,
+  onAddInviteToFriendsSocket,
+  onAddToFriendsSocket,
+  onConnectSocket,
+  onDisconnectSocket,
+  onRemoveFromFriendsSocket,
+} from './sockets';
 
 dotenv.config();
 
@@ -34,127 +42,23 @@ app.use('/api', defaultRouter);
 app.use(isError);
 
 io.on('connection', (socket) => {
-  // ON-CONNECT - кастомное событие
-  socket.on('on-connect', async (userId: string) => {
-    try {
-      const user = await User.findById(userId);
+  // ON-CONNECT - (кастомное событие) - событие подключения клиента к сокету
+  onConnectSocket(io, socket);
 
-      if (!user) {
-        throw ApiError.BadRequest('Пользователь не найден.');
-      }
+  // ON-DISCONNECT - (кастомное событие) - событие отключения клиента от сокета
+  onDisconnectSocket(io, socket);
 
-      user.status = 'online';
-      user.socketId = socket.id;
+  // DISCONNECT - событие отключение одного из пользователей
+  disconnectSocket(io, socket);
 
-      await user?.save();
+  // ON-ADD-INVITE-TO-FRIENDS - (кастомное событие) - событие отправки приглашения в друзья пользователю
+  onAddInviteToFriendsSocket(io, socket);
 
-      // socket.emit('on-connect'); // Отправка только себе
-      // socket.broadcast.emit('on-connect'); // Отправка всем клиентам кроме себя
+  // ON-ADD-TO-FRIENDS - (кастомное событие) - событие добавления в друзья пользователя
+  onAddToFriendsSocket(io, socket);
 
-      io.emit('on-connect'); // Отправка всем клиентам в сети
-    } catch (error) {
-      console.log(error);
-    }
-  });
-
-  // ON-DISCONNECT - кастомное событие
-  socket.on('on-disconnect', async (userId: string) => {
-    try {
-      const user = await User.findById(userId);
-
-      if (!user) {
-        throw ApiError.BadRequest('Пользователь не найден.');
-      }
-
-      user.status = 'offline';
-      user.socketId = '';
-
-      await user?.save();
-
-      // socket.emit('on-connect'); // Отправка только себе
-      // socket.broadcast.emit('on-connect'); // Отправка всем клиентам кроме себя
-
-      io.emit('on-disconnect'); // Отправка всем клиентам в сети
-    } catch (error) {
-      console.log(error);
-    }
-  });
-
-  //  DISCONNECT - событие отключение одного из пользователей
-  socket.on('disconnect', async () => {
-    try {
-      console.log('disconnect', socket);
-
-      const user = await User.findOne({ socketId: socket.id });
-
-      if (!user) {
-        throw ApiError.BadRequest('Пользователь не найден.');
-      }
-
-      user.status = 'offline';
-      user.socketId = '';
-
-      await user?.save();
-
-      // socket.emit('on-connect'); // Отправка только себе
-      // socket.broadcast.emit('on-connect'); // Отправка всем клиентам кроме себя
-
-      io.emit('on-disconnect'); // Отправка всем клиентам в сети
-    } catch (error) {
-      console.log(error);
-    }
-  });
-
-  // ON-ADD-INVITE-TO-FRIENDS
-  socket.on('on-add-invite-to-friends', async (userId: string) => {
-    try {
-      const user = await User.findById(userId);
-
-      if (!user) {
-        throw ApiError.BadRequest('Пользователь не найден.');
-      }
-
-      socket.to(user.socketId).emit('on-add-invite-to-friends'); // Отправка пользователю, которого добавляют в друзья
-      socket.emit('on-add-invite-to-friends'); // Отправка пользователю, который добавляет в друзья
-      // TODO: Продолжить добавлять событие добавления в друзья
-    } catch (error) {
-      console.log(error);
-    }
-  });
-
-  // ON-ADD-TO-FRIENDS
-  socket.on('on-add-to-friends', async (userId: string) => {
-    try {
-      const user = await User.findById(userId);
-
-      if (!user) {
-        throw ApiError.BadRequest('Пользователь не найден.');
-      }
-
-      socket.to(user.socketId).emit('on-add-to-friends'); // Отправка пользователю, который отправлял приглашение в друзья
-      socket.emit('on-add-to-friends'); // Отправка пользователю, который принял приглашение в друзья
-
-      // TODO: Продолжить добавлять событие добавления в друзья
-    } catch (error) {
-      console.log(error);
-    }
-  });
-
-  // ON-REMOVE-FROM-FRIENDS - удаление из пользователей (кастомное событие)
-  socket.on('on-remove-from-friends', async (userId: string) => {
-    try {
-      const user = await User.findById(userId); // Пользователь которого удаляют из друзей
-
-      if (!user) {
-        throw ApiError.BadRequest('Пользователь не найден.');
-      }
-
-      socket.to(user.socketId).emit('on-remove-from-friends'); // Отправка пользователю, который которого удаляют из друзей
-      socket.emit('on-remove-from-friends'); // Отправка пользователю, который удаляет из друзей
-    } catch (error) {
-      console.log(error);
-    }
-  });
+  // ON-REMOVE-FROM-FRIENDS - (кастомное событие) - событие удаление пользователя из друзей
+  onRemoveFromFriendsSocket(io, socket);
 
   // ON-REMOVE-INVITE-TO-FRIENDS - отклонение приглашения в друзья (кастомное событие)
   socket.on('on-remove-invite-to-friends', async (userId: string) => {
