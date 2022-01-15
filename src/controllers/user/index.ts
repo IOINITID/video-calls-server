@@ -95,7 +95,7 @@ class UserController {
 
   public getUsers: RequestHandler = async (req, res, next) => {
     try {
-      const users = await userService.getUsers();
+      const users = await userService.getUsers(req.body.searchValue);
 
       return res.json(users);
     } catch (error) {

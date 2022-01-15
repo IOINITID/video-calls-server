@@ -116,9 +116,13 @@ class UserService {
     }
   };
 
-  public getUsers = async () => {
+  public getUsers = async (searchValue: string) => {
     try {
-      const users = await User.find();
+      if (!searchValue) {
+        return [];
+      }
+
+      const users = await User.find({ name: { $regex: searchValue } });
 
       return users;
     } catch (error) {

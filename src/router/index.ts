@@ -22,7 +22,7 @@ router.get('/activate/:link', userController.activate);
 
 router.get('/refresh', userController.refresh);
 
-router.get('/users', isAuthorizated, userController.getUsers);
+router.post('/users', isAuthorizated, userController.getUsers);
 
 router.get('/friends', isAuthorizated, userController.getFriends);
 
