@@ -366,13 +366,57 @@ class UserService {
         throw ApiError.BadRequest('Такого канала нет.');
       }
 
-      const messages = Promise.all(
+      const messages = await Promise.all(
         channel.messages.map(async (messageId) => {
           return await Message.findById(messageId);
         })
       );
 
       return messages;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  public addPersonalMessagesChannel = async (userId: ObjectId, friendId: ObjectId) => {
+    try {
+      const user = await User.findById(userId);
+
+      if (!user) {
+        throw ApiError.BadRequest('Такого пользователя нет.');
+      }
+
+      const friend = await User.findById(friendId);
+
+      if (!friend) {
+        throw ApiError.BadRequest('Такого пользователя нет.');
+      }
+
+      const personalMessagesChannel = await Channel.create({ users: [userId, friendId] });
+
+      return personalMessagesChannel;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  public getPersonalMessagesChannels = async (userId: ObjectId) => {
+    try {
+      const personalMessagesChannels = await Channel.find({ users: userId });
+
+      if (!personalMessagesChannels) {
+        throw ApiError.BadRequest('Такой комнаты нет.');
+      }
+
+      const users = await Promise.all(
+        personalMessagesChannels.map(async (value) => {
+          const userData = await User.findById(value.users?.find((user: any) => String(user) !== String(userId)));
+
+          return { value, userData };
+        })
+      );
+
+      return users;
     } catch (error) {
       throw error;
     }

@@ -4,6 +4,7 @@ type ChannelModel = {
   title: string;
   type: 'text' | 'video';
   messages: ObjectId[];
+  users?: ObjectId[];
 };
 
 const channelSchema = new Schema<ChannelModel>(
@@ -14,6 +15,12 @@ const channelSchema = new Schema<ChannelModel>(
       {
         type: Schema.Types.ObjectId,
         ref: 'Message',
+      },
+    ],
+    users: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
       },
     ],
   },

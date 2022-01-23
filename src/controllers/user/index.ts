@@ -212,6 +212,29 @@ class UserController {
       next(error);
     }
   };
+
+  public addPersonalMessagesChannel: RequestHandler = async (req, res, next) => {
+    try {
+      const personalMessagesChannel = await userService.addPersonalMessagesChannel(
+        (req as any).user.id,
+        req.body.friendId
+      );
+
+      return res.json(personalMessagesChannel);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public getPersonalMessagesChannels: RequestHandler = async (req, res, next) => {
+    try {
+      const personalMessagesChannels = await userService.getPersonalMessagesChannels((req as any).user.id);
+
+      return res.json(personalMessagesChannels);
+    } catch (error) {
+      next(error);
+    }
+  };
 }
 
 export const userController = new UserController();

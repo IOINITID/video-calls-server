@@ -11,6 +11,7 @@ type UserModel = {
   friends: ObjectId[];
   invites: ObjectId[];
   waitingForApproval: ObjectId[];
+  personalMessages: ObjectId;
 };
 
 const userSchema = new Schema<UserModel>(
@@ -61,6 +62,10 @@ const userSchema = new Schema<UserModel>(
         ref: 'User',
       },
     ],
+    personalMessages: {
+      type: Schema.Types.ObjectId,
+      ref: 'Channel',
+    },
   },
   {
     timestamps: true,

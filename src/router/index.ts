@@ -46,4 +46,8 @@ router.post('/add-message-to-channel', isAuthorizated, userController.addMessage
 
 router.post('/get-channel-messages', isAuthorizated, userController.getChannelMessages);
 
+router.post('/add-personal-messages-channel', isAuthorizated, userController.addPersonalMessagesChannel);
+
+router.post('/get-personal-messages-channels', isAuthorizated, userController.getPersonalMessagesChannels);
+
 export const defaultRouter = router;
