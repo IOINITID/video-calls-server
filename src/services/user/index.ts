@@ -72,7 +72,7 @@ class UserService {
 
       await tokenService.saveToken(userDto.id, tokens.refreshToken);
 
-      return { ...tokens, user: userDto };
+      return { ...tokens };
     } catch (error) {
       throw error;
     }
@@ -80,9 +80,7 @@ class UserService {
 
   public logout = async (refreshToken: string) => {
     try {
-      const token = await tokenService.removeToken(refreshToken);
-
-      return token;
+      await tokenService.removeToken(refreshToken);
     } catch (error) {
       throw error;
     }
@@ -110,7 +108,7 @@ class UserService {
 
       await tokenService.saveToken(userDto.id, tokens.refreshToken);
 
-      return { ...tokens, user: userDto };
+      return { ...tokens };
     } catch (error) {
       throw error;
     }

@@ -5,7 +5,9 @@ import { isAuthorizated } from '../middlewares';
 
 const router = Router();
 
-router.get('/server-loading', userController.serverLoading);
+router.post('/authorization', userController.authorization);
+
+router.get('/refresh', userController.refresh);
 
 router.post(
   '/registration',
@@ -14,13 +16,9 @@ router.post(
   userController.registration
 );
 
-router.post('/authorization', userController.authorization);
-
-router.post('/logout', userController.logout);
+router.get('/logout', userController.logout);
 
 router.get('/activate/:link', userController.activate);
-
-router.get('/refresh', userController.refresh);
 
 router.post('/users', isAuthorizated, userController.getUsers);
 

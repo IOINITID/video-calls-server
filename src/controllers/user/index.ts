@@ -5,14 +5,6 @@ import { ApiError } from '../../exeptions';
 import { userService } from '../../services';
 
 class UserController {
-  public serverLoading: RequestHandler = async (req, res, next) => {
-    try {
-      return res.json({ status: 'online' });
-    } catch (error) {
-      next(error);
-    }
-  };
-
   public registration: RequestHandler = async (req, res, next) => {
     try {
       const errors = validationResult(req);
@@ -48,7 +40,7 @@ class UserController {
         secure: true,
       });
 
-      return res.json(userData);
+      return res.json({ accessToken: userData.accessToken });
     } catch (error) {
       next(error);
     }
@@ -56,11 +48,11 @@ class UserController {
 
   public logout: RequestHandler = async (req, res, next) => {
     try {
-      const token = await userService.logout(req.cookies.refreshToken);
+      await userService.logout(req.cookies.refreshToken);
 
       res.clearCookie('refreshToken');
 
-      return res.json(token);
+      return res.end();
     } catch (error) {
       next(error);
     }
@@ -87,7 +79,7 @@ class UserController {
         secure: true,
       });
 
-      return res.json(userData);
+      return res.json({ accessToken: userData.accessToken });
     } catch (error) {
       next(error);
     }
