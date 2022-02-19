@@ -3,12 +3,12 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
-import { CORS_ORIGIN, MONGO_URL, PORT } from './constants';
-import { defaultRouter } from './router';
-import { isError } from './middlewares';
+import { CORS_ORIGIN, MONGO_URL, PORT } from 'core/constants';
+import { isErrorMiddleware } from 'core/middlewares';
 import { Server } from 'socket.io';
 import http from 'http';
-import { connectSocket } from './sockets';
+import { connectionSocket } from 'core/sockets';
+import { userRouter } from 'modules/user/router';
 
 dotenv.config();
 
@@ -28,10 +28,14 @@ app.use(
     origin: CORS_ORIGIN,
   })
 );
-app.use('/api', defaultRouter);
-app.use(isError);
+app.use('/api/user', userRouter);
+app.use(isErrorMiddleware);
 
-io.on('connection', (socket) => connectSocket(io, socket)); // CONNECT - событие подключения к сокету
+app.get('/', (req, res, next) => {
+  return res.json({ status: 'online' });
+});
+
+io.on('connection', (socket) => connectionSocket(io, socket)); // CONNECTION - событие подключения к сокету
 
 const startServer = async () => {
   try {

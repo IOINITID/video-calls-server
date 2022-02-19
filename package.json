@@ -6,7 +6,7 @@
   "main": "./dist/index.js",
   "scripts": {
     "start": "yarn run build && node ./dist/index.js",
-    "dev": "nodemon ./src/index.ts",
+    "dev": "nodemon --require tsconfig-paths/register ./src/index.ts",
     "build": "npx tsc --project tsconfig.json"
   },
   "repository": {
@@ -45,6 +45,7 @@
   },
   "devDependencies": {
     "nodemon": "^2.0.15",
-    "ts-node": "^10.4.0"
+    "ts-node": "^10.4.0",
+    "tsconfig-paths": "^3.12.0"
   }
 }
