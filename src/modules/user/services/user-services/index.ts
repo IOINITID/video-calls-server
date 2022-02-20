@@ -124,7 +124,7 @@ export const userLogoutService = async (refreshToken: string) => {
  */
 export const userUserService = async (userId: string) => {
   try {
-    const user = await userModel.findOne({ id: userId });
+    const user = await userModel.findOne({ _id: userId });
 
     return user && getUserDTO(user);
   } catch (error) {
