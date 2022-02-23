@@ -7,8 +7,11 @@ import {
   userAuthorizationController,
   userRefreshController,
   userRegistrationController,
-  userUserController,
+  getUserController,
+  patchUserController,
 } from 'modules/user/controllers';
+
+// TODO: Сменить название для всех сервисов на patchUserService
 
 /**
  * Router for user module.
@@ -31,6 +34,7 @@ userRouter.get('/refresh', userRefreshController);
 userRouter.post(
   '/registration',
   body('email').isEmail(),
+  body('name').not().isEmpty(),
   body('password').isLength({ min: 8 }),
   userRegistrationController
 );
@@ -41,9 +45,14 @@ userRouter.post(
 userRouter.get('/logout', userLogoutController);
 
 /**
- * Route for getting users by name.
+ * Route for getting user data.
  */
-userRouter.get('/user', isAuthorizatedMiddleware, userUserController);
+userRouter.get('/user', isAuthorizatedMiddleware, getUserController);
+
+/**
+ * Route for updating user data.
+ */
+userRouter.patch('/user', isAuthorizatedMiddleware, patchUserController);
 
 /**
  * Route for getting users by name.

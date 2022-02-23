@@ -1,10 +1,14 @@
 import { model, ObjectId, Schema } from 'mongoose';
 
+// TODO: Добавить цвет профля пользователя по умолчанию набор из нескольких случайных
+// TODO: Добавить ссылку на изображение
 export type UserModel = {
   id: string;
   email: string;
   name: string;
   password: string;
+  color: string;
+  image: string;
   isActivated: boolean;
   activationLink: string;
   status: string;
@@ -27,6 +31,14 @@ const userSchema = new Schema<UserModel>(
       default: '',
     },
     password: {
+      type: String,
+      required: true,
+    },
+    color: {
+      type: String,
+      required: true,
+    },
+    image: {
       type: String,
       required: true,
     },

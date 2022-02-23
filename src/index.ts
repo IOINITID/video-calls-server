@@ -1,4 +1,4 @@
-import express, { json } from 'express';
+import express, { json, urlencoded } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
@@ -20,7 +20,7 @@ const io = new Server(server, {
   },
 });
 
-app.use(json());
+app.use(json({ limit: '10mb' }));
 app.use(cookieParser());
 app.use(
   cors({
