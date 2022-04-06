@@ -155,6 +155,34 @@ export const getUserService = async (userId: string) => {
  */
 export const patchUserService = async (userId: string, userData: Partial<UserModel>) => {
   try {
+    if (userData.color || userData.image) {
+      const user = await userModel.findOne({ _id: userId });
+
+      if (!user) {
+        throw ApiError.BadRequest('Пользователь не найден.');
+      }
+
+      if (userData.color) {
+        user.color = userData.color;
+      }
+
+      if (userData.image) {
+        const uploadedResponse = await cloudinary.uploader.upload(userData.image, {
+          folder: 'video-calls',
+          eager: { quality: '75', fetch_format: 'jpg' },
+        });
+
+        const averageColor = await getAverageColor(userData.image);
+
+        user.image = uploadedResponse.eager[0].secure_url;
+        user.color = averageColor.hex;
+      }
+
+      await user.save();
+
+      return getUserDTO(user);
+    }
+
     if (userData.name === '') {
       throw ApiError.BadRequest('Новое имя пользователя не заполненно.');
     }
@@ -165,14 +193,6 @@ export const patchUserService = async (userId: string, userData: Partial<UserMod
 
     if (!userData.password) {
       throw ApiError.BadRequest('Пароль не заполнен.');
-    }
-
-    if (userData.color === '') {
-      throw ApiError.BadRequest('Новый цвет профиля не заполнен.');
-    }
-
-    if (userData.image === '') {
-      throw ApiError.BadRequest('Новое изображение профиля не заполнено.');
     }
 
     const user = await userModel.findOne({ _id: userId });
