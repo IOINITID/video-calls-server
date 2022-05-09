@@ -10,6 +10,7 @@ export const getUserDTO = (userModel: UserModel) => {
     name: userModel.name,
     color: userModel.color,
     default_color: userModel.default_color,
+    description: userModel.description,
     status: userModel.status,
     socket_id: userModel.socket_id,
     image: userModel.image,

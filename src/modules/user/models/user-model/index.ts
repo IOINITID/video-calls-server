@@ -12,6 +12,8 @@ export type UserModel = {
   password: string;
   color: string;
   default_color: string;
+  // user_color: string; // TODO: Добавить цвет который пользователь может сам менять
+  description: string;
   status: 'online' | 'offline';
   socket_id: string;
   image: string;
@@ -41,6 +43,10 @@ const userSchema = new Schema<UserModel>(
     default_color: {
       type: String,
       required: true,
+    },
+    description: {
+      type: String,
+      default: '',
     },
     color: {
       type: String,

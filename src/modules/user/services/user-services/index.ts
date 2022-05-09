@@ -174,13 +174,13 @@ export const getUserService = async (userId: string) => {
  */
 export const patchUserService = async (userId: string, userData: Partial<UserModel>) => {
   try {
-    if (userData.color || userData.image) {
-      const user = await userModel.findOne({ _id: userId });
+    const user = await userModel.findOne({ _id: userId });
 
-      if (!user) {
-        throw ApiError.BadRequest('Пользователь не найден.');
-      }
+    if (!user) {
+      throw ApiError.BadRequest('Пользователь не найден.');
+    }
 
+    if (userData.color || userData.image || userData.description) {
       if (userData.color) {
         user.color = userData.color;
       }
@@ -195,6 +195,10 @@ export const patchUserService = async (userId: string, userData: Partial<UserMod
 
         user.image = uploadedResponse.eager[0].secure_url;
         user.color = averageColor.hex;
+      }
+
+      if (userData.description) {
+        user.description = userData.description;
       }
 
       await user.save();
@@ -214,16 +218,15 @@ export const patchUserService = async (userId: string, userData: Partial<UserMod
       throw ApiError.BadRequest('Пароль не заполнен.');
     }
 
-    const user = await userModel.findOne({ _id: userId });
-
-    if (!user) {
-      throw ApiError.BadRequest('Пользователь не найден.');
-    }
-
     const isPasswordEquals = await bcrypt.compare(userData.password, user.password);
 
     if (!isPasswordEquals) {
       throw ApiError.BadRequest('Пароль не верный.');
+    }
+
+    if (userData.image === '' && userData.password) {
+      user.image = '';
+      user.color = '';
     }
 
     if (userData.name) {
