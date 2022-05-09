@@ -9,9 +9,9 @@ export const getUserDTO = (userModel: UserModel) => {
     email: userModel.email,
     name: userModel.name,
     color: userModel.color,
-    image: userModel.image,
-    isActivated: userModel.isActivated,
+    default_color: userModel.default_color,
     status: userModel.status,
-    socketId: userModel.socketId,
+    socket_id: userModel.socket_id,
+    image: userModel.image,
   };
 };

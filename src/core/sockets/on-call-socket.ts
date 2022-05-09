@@ -18,7 +18,7 @@ const onCallSocket = (io: Server, socket: Socket) => {
         throw ApiError.BadRequest('Пользователь которому вы звоните не найден.');
       }
 
-      socket.to(userToCall.socketId).emit('on-call', signalData, user.id);
+      socket.to(userToCall.socket_id).emit('on-call', signalData, user.id);
     } catch (error) {
       console.log(error);
     }

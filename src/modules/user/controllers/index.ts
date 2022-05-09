@@ -56,23 +56,32 @@ export const userRefreshController: RequestHandler = async (req, res, next) => {
  */
 export const userRegistrationController: RequestHandler = async (req, res, next) => {
   try {
+    // NOTE: Время истечения refresh токена 30 дней
+    const MAX_AGE = 30 * 24 * 60 * 60 * 1000;
+
+    // NOTE: Результат валидации данных которые ввел пользователь при регистрации
     const errors = validationResult(req);
 
+    // NOTE: Проверка на наличие ошибок валидации
     if (!errors.isEmpty()) {
       return next(ApiError.BadRequest('Ошибка при валидации.', errors.array()));
     }
 
-    const userData = await userRegistrationService(req.body.email, req.body.name, req.body.password);
+    // NOTE: Данные которые ввел пользователь при регистрации
+    const { email, name, password } = req.body;
+
+    // NOTE: Данные для авторизации, access и refresh токены.
+    const userData = await userRegistrationService({ email, name, password });
 
     // TODO: Разобраться с Same-Site='NONE' заголовками для установку cookie в ответе из heroku
     res.cookie('refreshToken', userData.refreshToken, {
-      maxAge: 30 * 24 * 60 * 60 * 1000,
+      maxAge: MAX_AGE,
       httpOnly: true,
       sameSite: 'none',
       secure: true,
     });
 
-    return res.json(userData);
+    return res.status(200).json(userData);
   } catch (error) {
     next(error);
   }

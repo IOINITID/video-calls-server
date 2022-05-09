@@ -13,7 +13,7 @@ const onRemoveFromFriendsSocket = (io: Server, socket: Socket) => {
       }
 
       socket.emit('on-remove-from-friends'); // Отправка пользователю который удаляет из друзей
-      socket.to(user.socketId).emit('on-remove-from-friends'); // Отправка пользователю которого удаляют из друзей
+      socket.to(user.socket_id).emit('on-remove-from-friends'); // Отправка пользователю которого удаляют из друзей
     } catch (error) {
       console.log(error);
     }

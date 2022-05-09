@@ -13,7 +13,7 @@ const onCallEndSocket = (io: Server, socket: Socket) => {
       }
 
       socket.emit('on-call-end'); // Отправка события окончания вызова пользователю который звонил
-      socket.to(user.socketId).emit('on-call-end'); // Отправка события окончания вызова пользователю который принимал вызов
+      socket.to(user.socket_id).emit('on-call-end'); // Отправка события окончания вызова пользователю который принимал вызов
     } catch (error) {
       console.log(error);
     }

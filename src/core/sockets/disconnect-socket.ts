@@ -6,14 +6,14 @@ import { userModel } from '../../modules/user/models/user-model';
 const disconnectSocket = (io: Server, socket: Socket) => {
   socket.on('disconnect', async () => {
     try {
-      const user = await userModel.findOne({ socketId: socket.id });
+      const user = await userModel.findOne({ socket_id: socket.id });
 
       if (!user) {
         throw ApiError.BadRequest('Пользователь не найден.');
       }
 
       user.status = 'offline';
-      user.socketId = '';
+      user.socket_id = '';
 
       await user.save();
 

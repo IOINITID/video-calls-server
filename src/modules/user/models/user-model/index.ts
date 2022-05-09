@@ -1,88 +1,95 @@
 import { model, ObjectId, Schema } from 'mongoose';
 
-// TODO: Добавить цвет профля пользователя по умолчанию набор из нескольких случайных
-// TODO: Добавить ссылку на изображение
-export type UserModel = {
+type UserModelDocument = {
+  // NOTE: Поля которые создаются автоматически
   id: string;
+};
+
+export type UserModel = {
+  // NOTE: Поля которые созданы
   email: string;
   name: string;
   password: string;
   color: string;
+  default_color: string;
+  status: 'online' | 'offline';
+  socket_id: string;
   image: string;
+  // NOTE: Данные которые нужно обработать
   isActivated: boolean;
   activationLink: string;
-  status: string;
-  socketId: string;
   friends: ObjectId[];
   invites: ObjectId[];
   waitingForApproval: ObjectId[];
   personalMessages: ObjectId;
-};
+} & UserModelDocument;
 
 const userSchema = new Schema<UserModel>(
   {
     email: {
       type: String,
-      unique: true,
       required: true,
     },
     name: {
       type: String,
-      default: '',
+      required: true,
     },
     password: {
       type: String,
       required: true,
     },
+    default_color: {
+      type: String,
+      required: true,
+    },
     color: {
       type: String,
-      required: true,
-    },
-    image: {
-      type: String,
-      required: true,
-    },
-    isActivated: {
-      type: Boolean,
-      default: false,
-    },
-    activationLink: {
-      type: String,
+      default: '',
     },
     status: {
       type: String,
       default: 'offline',
     },
-    socketId: {
+    socket_id: {
       type: String,
       default: '',
     },
-    friends: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-      },
-    ],
-    invites: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-      },
-    ],
-    waitingForApproval: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-      },
-    ],
-    personalMessages: {
-      type: Schema.Types.ObjectId,
-      ref: 'Channel',
+    image: {
+      type: String,
+      default: '',
     },
+    // NOTE: Данные которые нужно обработать
+    // isActivated: {
+    //   type: Boolean,
+    //   default: false,
+    // },
+    // activationLink: {
+    //   type: String,
+    // },
+    // friends: [
+    //   {
+    //     type: Schema.Types.ObjectId,
+    //     ref: 'User',
+    //   },
+    // ],
+    // invites: [
+    //   {
+    //     type: Schema.Types.ObjectId,
+    //     ref: 'User',
+    //   },
+    // ],
+    // waitingForApproval: [
+    //   {
+    //     type: Schema.Types.ObjectId,
+    //     ref: 'User',
+    //   },
+    // ],
+    // personalMessages: {
+    //   type: Schema.Types.ObjectId,
+    //   ref: 'Channel',
+    // },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
 export const userModel = model<UserModel>('User', userSchema);

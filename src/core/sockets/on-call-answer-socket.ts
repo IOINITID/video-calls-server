@@ -12,7 +12,7 @@ const onCallAnswerSocket = (io: Server, socket: Socket) => {
         throw ApiError.BadRequest('Пользователь не найден.');
       }
 
-      socket.to(user.socketId).emit('on-call-answer', signalData);
+      socket.to(user.socket_id).emit('on-call-answer', signalData);
     } catch (error) {
       console.log(error);
     }

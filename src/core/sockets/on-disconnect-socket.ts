@@ -13,7 +13,7 @@ const onDisconnectSocket = (io: Server, socket: Socket) => {
       }
 
       user.status = 'offline';
-      user.socketId = '';
+      user.socket_id = '';
 
       await user.save();
 

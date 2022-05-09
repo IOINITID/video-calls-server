@@ -13,7 +13,7 @@ const onAddToFriendsSocket = (io: Server, socket: Socket) => {
       }
 
       socket.emit('on-add-to-friends'); // Отправка пользователю который принял приглашение в друзья
-      socket.to(user.socketId).emit('on-add-to-friends'); // Отправка пользователю который отправлял приглашение в друзья
+      socket.to(user.socket_id).emit('on-add-to-friends'); // Отправка пользователю который отправлял приглашение в друзья
     } catch (error) {
       console.log(error);
     }

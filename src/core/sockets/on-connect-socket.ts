@@ -13,7 +13,7 @@ const onConnectSocket = (io: Server, socket: Socket) => {
       }
 
       user.status = 'online';
-      user.socketId = socket.id;
+      user.socket_id = socket.id;
 
       await user.save();
 

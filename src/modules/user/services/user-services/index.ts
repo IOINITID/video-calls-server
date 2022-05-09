@@ -88,35 +88,54 @@ export const userRefreshService = async (refreshToken: string) => {
 /**
  * Service for user registration.
  */
-export const userRegistrationService = async (email: string, name: string, password: string) => {
+export const userRegistrationService = async ({
+  email,
+  name,
+  password,
+}: {
+  email: string;
+  name: string;
+  password: string;
+}) => {
   try {
+    // NOTE: Пользователь который еще не зарегистрирован
     const candidate = await userModel.findOne({ email });
 
     if (candidate) {
       throw ApiError.BadRequest(`Пользователь с почтовым адресом ${email} уже существует.`);
     }
 
-    const hashPassword = await bcrypt.hash(password, 3);
+    // NOTE: Захешированный пароль для хранения в БД
+    const hashedPassword = await bcrypt.hash(password, 3);
 
-    const activationLink = nanoid();
+    // const activationLink = nanoid();
 
     // TODO: Вынести в константы
     const colors = ['#e46861', '#50c77b', '#c3e161', '#70a941', '#5c6905'];
 
-    const color = colors[Math.ceil(Math.random() * colors.length - 1)];
+    // NOTE: Цвет по умолчанию при регистрации
+    const defaultColor = colors[Math.ceil(Math.random() * colors.length - 1)];
 
-    const user = await userModel.create({ email, name, color, password: hashPassword, activationLink });
+    const user = await userModel.create({
+      email,
+      name,
+      password: hashedPassword,
+      default_color: defaultColor,
+    });
 
     // TODO: Ошибка в сервисе отправки писем
     // await mailActivationService(email, `${API_URL}/api/activate/${activationLink}`);
 
+    // NOTE: Данные пользователя для отправки в ответе
     const userDto = getUserDTO(user);
 
+    // NOTE: Access и refresh токены
     const tokens = generateTokens({ ...userDto });
 
     await saveToken(userDto.id, tokens.refreshToken);
 
-    return { ...tokens, user: userDto };
+    // TODO: Добавить разделение на API (registration, authorization, users)
+    return tokens;
   } catch (error) {
     throw error;
   }
