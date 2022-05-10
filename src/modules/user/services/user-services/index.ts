@@ -174,13 +174,35 @@ export const getUserService = async (userId: string) => {
  */
 export const patchUserService = async (userId: string, userData: Partial<UserModel>) => {
   try {
-    const user = await userModel.findOne({ _id: userId });
+    const user = await userModel.findOne({ id: userId });
 
     if (!user) {
       throw ApiError.BadRequest('Пользователь не найден.');
     }
 
-    if (userData.color || userData.image || userData.description) {
+    if (userData.password) {
+      const isPasswordEquals = await bcrypt.compare(userData.password, user.password);
+
+      if (isPasswordEquals) {
+        if (userData.name) {
+          user.name = userData.name;
+        } else {
+          throw ApiError.BadRequest('Новое имя пользователя не заполненно.');
+        }
+
+        if (userData.email) {
+          user.email = userData.email;
+        } else {
+          throw ApiError.BadRequest('Новый email пользователя не заполнен.');
+        }
+      } else {
+        throw ApiError.BadRequest('Пароль не верный.');
+      }
+    } else {
+      if (userData.description) {
+        user.description = userData.description;
+      }
+
       if (userData.color) {
         user.color = userData.color;
       }
@@ -195,62 +217,12 @@ export const patchUserService = async (userId: string, userData: Partial<UserMod
 
         user.image = uploadedResponse.eager[0].secure_url;
         user.color = averageColor.hex;
+      } else if (userData.image === '') {
+        user.image = '';
+        user.color = '';
       }
 
-      if (userData.description) {
-        user.description = userData.description;
-      }
-
-      await user.save();
-
-      return getUserDTO(user);
-    }
-
-    if (userData.name === '') {
-      throw ApiError.BadRequest('Новое имя пользователя не заполненно.');
-    }
-
-    if (userData.email === '') {
-      throw ApiError.BadRequest('Новый email пользователя не заполнен.');
-    }
-
-    if (!userData.password) {
-      throw ApiError.BadRequest('Пароль не заполнен.');
-    }
-
-    const isPasswordEquals = await bcrypt.compare(userData.password, user.password);
-
-    if (!isPasswordEquals) {
-      throw ApiError.BadRequest('Пароль не верный.');
-    }
-
-    if (userData.image === '' && userData.password) {
-      user.image = '';
-      user.color = '';
-    }
-
-    if (userData.name) {
-      user.name = userData.name;
-    }
-
-    if (userData.email) {
-      user.email = userData.email;
-    }
-
-    if (userData.color) {
-      user.color = userData.color;
-    }
-
-    if (userData.image) {
-      const uploadedResponse = await cloudinary.uploader.upload(userData.image, {
-        folder: 'video-calls',
-        eager: { quality: '75', fetch_format: 'jpg' },
-      });
-
-      const averageColor = await getAverageColor(userData.image);
-
-      user.image = uploadedResponse.eager[0].secure_url;
-      user.color = averageColor.hex;
+      // throw ApiError.BadRequest('Пароль не заполнен.');
     }
 
     await user.save();
