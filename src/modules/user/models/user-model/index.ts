@@ -1,3 +1,4 @@
+import { getDefaultColor } from 'modules/user/utils';
 import { model, ObjectId, Schema } from 'mongoose';
 
 type UserModelDocument = {
@@ -42,7 +43,7 @@ const userSchema = new Schema<UserModel>(
     },
     default_color: {
       type: String,
-      required: true,
+      default: getDefaultColor(),
     },
     description: {
       type: String,
