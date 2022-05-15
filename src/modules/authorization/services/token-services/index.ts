@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
 import { JWT_ACCESS_SECRET, JWT_REFRESH_SECRET } from '../../../../core/constants';
-import { Token } from '../../models/token-model';
+import { tokenModel } from '../../models/token-model';
 
 dotenv.config();
 
@@ -13,15 +13,15 @@ export const generateTokens = (payload: any) => {
 };
 
 export const saveToken = async (user: string, refreshToken: string) => {
-  const tokenData = await Token.findOne({ user });
+  const tokenData = await tokenModel.findOne({ user });
 
   if (tokenData) {
-    tokenData.refreshToken = refreshToken;
+    tokenData.refresh_token = refreshToken;
 
     return tokenData.save();
   }
 
-  const token = await Token.create({ user, refreshToken });
+  const token = await tokenModel.create({ user, refreshToken });
 
   return token;
 };
@@ -48,7 +48,7 @@ export const validateRefreshToken = (token: string) => {
 
 export const removeToken = async (refreshToken: string) => {
   try {
-    const tokenData = await Token.deleteOne({ refreshToken });
+    const tokenData = await tokenModel.deleteOne({ refreshToken });
 
     return tokenData;
   } catch (error) {
@@ -58,7 +58,7 @@ export const removeToken = async (refreshToken: string) => {
 
 export const findToken = async (refreshToken: string) => {
   try {
-    const tokenData = await Token.findOne({ refreshToken });
+    const tokenData = await tokenModel.findOne({ refreshToken });
 
     return tokenData;
   } catch (error) {

@@ -1,19 +1,29 @@
 import { model, ObjectId, Schema } from 'mongoose';
 
-type TokenModel = {
-  user: ObjectId | string;
-  refreshToken: string;
+type TokenModelDocument = {
+  // NOTE: Поля которые создаются автоматически
+  id: string;
 };
 
-const tokenSchema = new Schema<TokenModel>({
-  user: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-  },
-  refreshToken: {
-    type: String,
-    required: true,
-  },
-});
+type TokenModel = {
+  user: ObjectId | string;
+  refresh_token: string;
+} & TokenModelDocument;
 
-export const Token = model<TokenModel>('Token', tokenSchema);
+const tokenSchema = new Schema<TokenModel>(
+  {
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+    },
+    refresh_token: {
+      type: String,
+      required: true,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+export const tokenModel = model<TokenModel>('Token', tokenSchema);
