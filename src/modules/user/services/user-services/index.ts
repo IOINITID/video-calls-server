@@ -9,7 +9,7 @@ import {
   removeToken,
   saveToken,
   validateRefreshToken,
-} from 'modules/user/services/token-services';
+} from 'modules/authorization/services/token-services';
 import { API_URL } from 'core/constants';
 import { mailActivationService } from 'modules/user/services/mail-services';
 import { v2 as cloudinary } from 'cloudinary';

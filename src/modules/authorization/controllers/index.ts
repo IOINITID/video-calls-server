@@ -1,10 +1,15 @@
 import { ApiError } from 'core/exeptions';
 import { RequestHandler } from 'express';
 import { validationResult } from 'express-validator';
-import { authorizationService, logoutService, refreshService, registrationService } from '../services';
+import {
+  authorizationService,
+  logoutService,
+  refreshService,
+  registrationService,
+} from '../services/authorization-services';
 
 /**
- * Controller for user registration.
+ * Controller для регистрации пользователя.
  */
 export const registrationController: RequestHandler = async (req, res, next) => {
   try {
@@ -40,7 +45,7 @@ export const registrationController: RequestHandler = async (req, res, next) => 
 };
 
 /**
- * Controller for user authorization.
+ * Controller для авторизации пользователя.
  */
 export const authorizationController: RequestHandler = async (req, res, next) => {
   try {
@@ -63,7 +68,7 @@ export const authorizationController: RequestHandler = async (req, res, next) =>
 };
 
 /**
- * Controller for user authorization refresh.
+ * Controller для обновления токена.
  */
 export const refreshController: RequestHandler = async (req, res, next) => {
   try {
@@ -86,7 +91,7 @@ export const refreshController: RequestHandler = async (req, res, next) => {
 };
 
 /**
- * Controller for user logout.
+ * Controller для выхода из аккаунта.
  */
 export const logoutController: RequestHandler = async (req, res, next) => {
   try {

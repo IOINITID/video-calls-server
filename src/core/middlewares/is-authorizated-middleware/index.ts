@@ -1,6 +1,6 @@
 import { Request, RequestHandler } from 'express';
 import { JwtPayload } from 'jsonwebtoken';
-import { validateAccessToken } from '../../../modules/user/services/token-services';
+import { validateAccessToken } from '../../../modules/authorization/services/token-services';
 import { ApiError } from '../../exeptions';
 
 export const isAuthorizatedMiddleware: RequestHandler = (req: Request & { user?: string | JwtPayload }, res, next) => {

@@ -9,6 +9,7 @@ import { Server } from 'socket.io';
 import http from 'http';
 import { connectionSocket } from 'core/sockets';
 import { userRouter } from 'modules/user/router';
+import { authorizationRouter } from 'modules/authorization/router';
 
 dotenv.config();
 
@@ -28,6 +29,7 @@ app.use(
     origin: CORS_ORIGIN,
   })
 );
+app.use('/api/authorization', authorizationRouter);
 app.use('/api/user', userRouter);
 app.use(isErrorMiddleware);
 

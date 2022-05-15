@@ -1,6 +1,5 @@
 import bcrypt from 'bcrypt';
 import { ApiError } from 'core/exeptions';
-import { getUserDTO } from 'modules/user/dtos';
 import { userModel } from 'modules/user/models/user-model';
 import {
   findToken,
@@ -8,37 +7,42 @@ import {
   removeToken,
   saveToken,
   validateRefreshToken,
-} from 'modules/user/services/token-services';
-import { getAuthorizationDTO } from '../dtos';
+} from 'modules/authorization/services/token-services';
+import { getAuthorizationDTO } from '../../dtos';
 
 /**
- * Service for user registration.
+ * Service для регистрации пользователя.
  */
 export const registrationService = async (payload: { email: string; name: string; password: string }) => {
   try {
-    // NOTE: Пользователь который уже зарегистрирован
-    const isUserExist = await userModel.findOne({ email: payload.email });
+    const { email, name, password } = payload;
 
-    if (isUserExist) {
+    // NOTE: Пользователь который уже зарегистрирован
+    const existingUser = await userModel.findOne({ email: payload.email });
+
+    if (existingUser) {
       throw ApiError.BadRequest(`Пользователь с почтовым адресом ${payload.email} уже существует.`);
     }
 
     // NOTE: Захешированный пароль для хранения в БД
-    const hashedPassword = await bcrypt.hash(payload.password, 3);
+    const hashedPassword = await bcrypt.hash(password, 3);
 
+    // NOTE: Hash ссылки для активации
     // const activationLink = nanoid();
 
-    const user = await userModel.create({ email: payload.email, name: payload.name, password: hashedPassword });
+    // NOTE: Созданный пользователь
+    const user = await userModel.create({ email, name, password: hashedPassword });
 
     // TODO: Ошибка в сервисе отправки писем
     // await mailActivationService(email, `${API_URL}/api/activate/${activationLink}`);
 
-    // NOTE: Данные для авторизации
+    // NOTE: Данные для авторизации, которые будут добавлены в токен
     const authorizationDTO = getAuthorizationDTO(user);
 
     // NOTE: Access и refresh токены
     const tokens = generateTokens(authorizationDTO);
 
+    // NOTE: Сохранение токена в БД
     await saveToken(authorizationDTO.id, tokens.refreshToken);
 
     return tokens;
@@ -48,7 +52,7 @@ export const registrationService = async (payload: { email: string; name: string
 };
 
 /**
- * Service for user authorization.
+ * Service для авторизации пользователя.
  */
 export const authorizationService = async (payload: { email: string; password: string }) => {
   try {
@@ -77,7 +81,7 @@ export const authorizationService = async (payload: { email: string; password: s
 };
 
 /**
- * Service for user authorization refresh.
+ * Service для обновления токенов.
  */
 export const refreshService = async (payload: { refreshToken: string }) => {
   try {
@@ -113,7 +117,7 @@ export const refreshService = async (payload: { refreshToken: string }) => {
 };
 
 /**
- * Service for user logout.
+ * Service для выхода из аккаунта.
  */
 export const logoutService = async (payload: { refreshToken: string }) => {
   try {
