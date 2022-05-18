@@ -5,6 +5,8 @@ import { tokenModel } from '../../models/token-model';
 
 dotenv.config();
 
+// TODO: Добавить Service окончание для сервисов и обновить названия
+
 export const generateTokens = (payload: any) => {
   const accessToken = jwt.sign(payload, JWT_ACCESS_SECRET, { expiresIn: '15m' });
   const refreshToken = jwt.sign(payload, JWT_REFRESH_SECRET, { expiresIn: '30d' });
@@ -13,24 +15,24 @@ export const generateTokens = (payload: any) => {
 };
 
 export const saveToken = async (user: string, refreshToken: string) => {
-  const tokenData = await tokenModel.findOne({ user });
+  const existingToken = await tokenModel.findOne({ user });
 
-  if (tokenData) {
-    tokenData.refresh_token = refreshToken;
+  if (existingToken) {
+    existingToken.refresh_token = refreshToken;
 
-    return tokenData.save();
+    return existingToken.save();
   }
 
-  const token = await tokenModel.create({ user, refreshToken });
+  const token = await tokenModel.create({ user, refresh_token: refreshToken });
 
   return token;
 };
 
 export const validateAccessToken = (token: string) => {
   try {
-    const userData = jwt.verify(token, JWT_ACCESS_SECRET);
+    const authorizationData = jwt.verify(token, JWT_ACCESS_SECRET);
 
-    return userData;
+    return authorizationData;
   } catch (error) {
     return null;
   }
@@ -38,9 +40,9 @@ export const validateAccessToken = (token: string) => {
 
 export const validateRefreshToken = (token: string) => {
   try {
-    const userData = jwt.verify(token, JWT_REFRESH_SECRET);
+    const authorizationData = jwt.verify(token, JWT_REFRESH_SECRET);
 
-    return userData;
+    return authorizationData;
   } catch (error) {
     return null;
   }
@@ -48,7 +50,7 @@ export const validateRefreshToken = (token: string) => {
 
 export const removeToken = async (refreshToken: string) => {
   try {
-    const tokenData = await tokenModel.deleteOne({ refreshToken });
+    const tokenData = await tokenModel.deleteOne({ refresh_token: refreshToken });
 
     return tokenData;
   } catch (error) {
@@ -58,7 +60,7 @@ export const removeToken = async (refreshToken: string) => {
 
 export const findToken = async (refreshToken: string) => {
   try {
-    const tokenData = await tokenModel.findOne({ refreshToken });
+    const tokenData = await tokenModel.findOne({ refresh_token: refreshToken });
 
     return tokenData;
   } catch (error) {

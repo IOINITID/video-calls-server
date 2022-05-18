@@ -1,7 +1,5 @@
 import { Router } from 'express';
 import { body } from 'express-validator';
-import { isAuthorizatedMiddleware } from 'core/middlewares';
-import { getUsersController, getUserController, updateUserController } from 'modules/user/controllers';
 import {
   authorizationController,
   logoutController,
