@@ -20,7 +20,7 @@ export const saveToken = async (user: string, refreshToken: string) => {
   if (existingToken) {
     existingToken.refresh_token = refreshToken;
 
-    return existingToken.save();
+    return await existingToken.save();
   }
 
   const token = await tokenModel.create({ user, refresh_token: refreshToken });
