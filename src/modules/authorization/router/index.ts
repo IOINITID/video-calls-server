@@ -13,18 +13,21 @@ import {
 const authorizationRouter = Router();
 
 /**
- * Validation для регистрации пользователя.
- */
-const registrationValidation = () => {
-  body('email').isEmail();
-  body('name').not().isEmpty();
-  body('password').isLength({ min: 8 });
-};
-
-/**
  * Route для регистрации пользователя.
  */
-authorizationRouter.post('/registration', registrationValidation, registrationController);
+authorizationRouter.post(
+  '/registration',
+  body('email')
+    .not()
+    .isEmpty()
+    .withMessage('Электронный адрес должен быть заполнен.')
+    .bail() // NOTE: Не проверяет дальше, если проверка этого не пройдена
+    .isEmail()
+    .withMessage('Электронный адрес заполнен некорректно.'),
+  body('name').not().isEmpty().withMessage('Имя должно быть заполнено.'),
+  body('password').isLength({ min: 8 }).withMessage('Пароль должен состоять минимум из 8 символов.'),
+  registrationController
+);
 
 /**
  * Route для авторизации пользователя.
