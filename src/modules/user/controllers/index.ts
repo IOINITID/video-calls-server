@@ -1,10 +1,15 @@
 import { RequestHandler } from 'express';
 import { validationResult } from 'express-validator';
 import { ApiError } from 'core/exeptions';
-import { userUsersService, patchUserService, getUserService } from 'modules/user/services/user-services';
+import {
+  userUsersService,
+  getUserService,
+  getUsersService,
+  updateUserService,
+} from 'modules/user/services/user-services';
 
 /**
- * Controller for getting user data.
+ * Controller для получения данных пользователя.
  */
 export const getUserController: RequestHandler = async (req, res, next) => {
   try {
@@ -17,11 +22,11 @@ export const getUserController: RequestHandler = async (req, res, next) => {
 };
 
 /**
- * Controller for updating user data.
+ * Controller для обновления данных пользователя.
  */
 export const updateUserController: RequestHandler = async (req, res, next) => {
   try {
-    const user = await patchUserService((req as any).user.id, req.body);
+    const user = await updateUserService((req as any).user.id, req.body);
 
     return res.json(user);
   } catch (error) {
@@ -30,11 +35,11 @@ export const updateUserController: RequestHandler = async (req, res, next) => {
 };
 
 /**
- * Controller for getting users by name.
+ * Controller для получения списка пользователей.
  */
 export const getUsersController: RequestHandler = async (req, res, next) => {
   try {
-    const users = await userUsersService(req.body.searchValue);
+    const users = await getUsersService();
 
     return res.json(users);
   } catch (error) {

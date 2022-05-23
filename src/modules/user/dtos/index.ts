@@ -16,3 +16,22 @@ export const getUserDTO = (userModel: UserModel) => {
     image: userModel.image,
   };
 };
+
+/**
+ * DTO для получения списка пользователей.
+ */
+export const getUsersDTO = (users: UserModel[]) => {
+  return users.map((user) => {
+    return {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      color: user.color,
+      default_color: user.default_color,
+      description: user.description,
+      status: user.status,
+      socket_id: user.socket_id,
+      image: user.image,
+    };
+  });
+};

@@ -1,7 +1,7 @@
 import { ApiError } from 'core/exeptions';
 import { UserModel, userModel } from 'modules/user/models/user-model';
 import bcrypt from 'bcrypt';
-import { getUserDTO } from 'modules/user/dtos';
+import { getUserDTO, getUsersDTO } from 'modules/user/dtos';
 import { nanoid } from 'nanoid';
 import {
   findToken,
@@ -22,7 +22,7 @@ cloudinary.config({
 });
 
 /**
- * Service for getting user data.
+ * Service для получения данных пользователя.
  */
 export const getUserService = async (userId: string) => {
   try {
@@ -39,9 +39,9 @@ export const getUserService = async (userId: string) => {
 };
 
 /**
- * Service for updating user data.
+ * Service для обновления данных пользователя.
  */
-export const patchUserService = async (userId: string, userData: Partial<UserModel>) => {
+export const updateUserService = async (userId: string, userData: Partial<UserModel>) => {
   try {
     const user = await userModel.findOne({ id: userId });
 
@@ -49,49 +49,56 @@ export const patchUserService = async (userId: string, userData: Partial<UserMod
       throw ApiError.BadRequest('Пользователь не найден.');
     }
 
-    if (userData.password) {
+    if (userData.name && userData.password) {
       const isPasswordEquals = await bcrypt.compare(userData.password, user.password);
 
-      if (isPasswordEquals) {
-        if (userData.name) {
-          user.name = userData.name;
-        } else {
-          throw ApiError.BadRequest('Новое имя пользователя не заполненно.');
-        }
-
-        if (userData.email) {
-          user.email = userData.email;
-        } else {
-          throw ApiError.BadRequest('Новый email пользователя не заполнен.');
-        }
-      } else {
+      if (!isPasswordEquals) {
         throw ApiError.BadRequest('Пароль не верный.');
       }
-    } else {
-      if (userData.description) {
-        user.description = userData.description;
+
+      // NOTE: Обновление имени пользователя
+      if (userData.name) {
+        user.name = userData.name;
+      }
+    }
+
+    if (userData.email && userData.password) {
+      const isPasswordEquals = await bcrypt.compare(userData.password, user.password);
+
+      if (!isPasswordEquals) {
+        throw ApiError.BadRequest('Пароль не верный.');
       }
 
-      if (userData.color) {
-        user.color = userData.color;
+      // NOTE: Обновление адреса электронной почты пользователя
+      if (userData.email) {
+        user.email = userData.email;
       }
+    }
 
-      if (userData.image) {
-        const uploadedResponse = await cloudinary.uploader.upload(userData.image, {
-          folder: 'video-calls',
-          eager: { quality: '75', fetch_format: 'jpg' },
-        });
+    // NOTE: Обновление описания пользователя
+    if (userData.description) {
+      user.description = userData.description;
+    }
 
-        const averageColor = await getAverageColor(userData.image);
+    // NOTE: Обновление цвета пользователя
+    if (userData.color) {
+      user.color = userData.color;
+    }
 
-        user.image = uploadedResponse.eager[0].secure_url;
-        user.color = averageColor.hex;
-      } else if (userData.image === '') {
-        user.image = '';
-        user.color = '';
-      }
+    // NOTE: Обновления изображения пользователя
+    if (userData.image) {
+      const uploadedResponse = await cloudinary.uploader.upload(userData.image, {
+        folder: 'video-calls',
+        eager: { quality: '75', fetch_format: 'jpg' },
+      });
 
-      // throw ApiError.BadRequest('Пароль не заполнен.');
+      const averageColor = await getAverageColor(userData.image);
+
+      user.image = uploadedResponse.eager[0].secure_url;
+      user.color = averageColor.hex;
+    } else if (userData.image === '') {
+      user.image = '';
+      user.color = '';
     }
 
     await user.save();
@@ -103,7 +110,21 @@ export const patchUserService = async (userId: string, userData: Partial<UserMod
 };
 
 /**
- * Service for getting users by name.
+ * Service для получения списка пользователей.
+ */
+export const getUsersService = async () => {
+  try {
+    const users = await userModel.find();
+    const usersData = getUsersDTO(users);
+
+    return usersData;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Service для получения списка пользователей.
  */
 export const userUsersService = async (searchValue: string) => {
   try {

@@ -30,7 +30,7 @@ app.use(
   })
 );
 app.use('/api/authorization', authorizationRouter);
-app.use('/api/user', userRouter);
+app.use('/api/users', userRouter);
 app.use(isErrorMiddleware);
 
 app.get('/', (req, res, next) => {

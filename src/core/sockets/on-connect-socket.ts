@@ -1,6 +1,6 @@
 import { Server, Socket } from 'socket.io';
 import { ApiError } from '../exeptions';
-import { userModel } from '../../modules/user/models/user-model';
+import { userModel } from 'modules/user/models/user-model';
 
 // ON-CONNECT - (кастомное событие) - событие подключения клиента к сокету
 const onConnectSocket = (io: Server, socket: Socket) => {
@@ -9,7 +9,8 @@ const onConnectSocket = (io: Server, socket: Socket) => {
       const user = await userModel.findById(userId);
 
       if (!user) {
-        throw ApiError.BadRequest('Пользователь не найден.');
+        // throw ApiError.BadRequest('Пользователь не найден.');
+        return;
       }
 
       user.status = 'online';

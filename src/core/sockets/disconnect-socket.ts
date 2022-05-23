@@ -1,6 +1,6 @@
 import { Server, Socket } from 'socket.io';
 import { ApiError } from '../exeptions';
-import { userModel } from '../../modules/user/models/user-model';
+import { userModel } from 'modules/user/models/user-model';
 
 // DISCONNECT - событие отключение одного из пользователей
 const disconnectSocket = (io: Server, socket: Socket) => {
@@ -9,7 +9,8 @@ const disconnectSocket = (io: Server, socket: Socket) => {
       const user = await userModel.findOne({ socket_id: socket.id });
 
       if (!user) {
-        throw ApiError.BadRequest('Пользователь не найден.');
+        // throw ApiError.BadRequest('Пользователь не найден.');
+        return;
       }
 
       user.status = 'offline';

@@ -2,26 +2,24 @@ import { Router } from 'express';
 import { isAuthorizatedMiddleware } from 'core/middlewares';
 import { getUsersController, getUserController, updateUserController } from 'modules/user/controllers';
 
-// TODO: Сменить название для всех сервисов на patchUserService
-
 /**
- * Router for user module.
+ * Router для модуля пользователи.
  */
 const userRouter = Router();
 
 /**
- * Route for getting user data.
+ * Route для получения данных пользователя.
  */
 userRouter.get('/user', isAuthorizatedMiddleware, getUserController);
 
 /**
- * Route for updating user data.
+ * Route для обновления данных пользователя.
  */
 userRouter.patch('/user', isAuthorizatedMiddleware, updateUserController);
 
 /**
- * Route for getting users by name.
+ * Route для получения списка пользователей.
  */
-userRouter.post('/users', isAuthorizatedMiddleware, getUsersController);
+userRouter.get('/users', isAuthorizatedMiddleware, getUsersController);
 
 export { userRouter };
