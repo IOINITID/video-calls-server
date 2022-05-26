@@ -1,21 +1,14 @@
 import { RequestHandler } from 'express';
-import { validationResult } from 'express-validator';
-import { ApiError } from 'core/exeptions';
-import {
-  userUsersService,
-  getUserService,
-  getUsersService,
-  updateUserService,
-} from 'modules/user/services/user-services';
+import { getUserService, getUsersService, updateUserService } from 'modules/user/services/user-services';
 
 /**
  * Controller для получения данных пользователя.
  */
 export const getUserController: RequestHandler = async (req, res, next) => {
   try {
-    const user = await getUserService((req as any).user.id);
+    const user = await getUserService({ userId: (req as any).user.id });
 
-    return res.json(user);
+    return res.status(200).json(user);
   } catch (error) {
     next(error);
   }
@@ -26,9 +19,9 @@ export const getUserController: RequestHandler = async (req, res, next) => {
  */
 export const updateUserController: RequestHandler = async (req, res, next) => {
   try {
-    const user = await updateUserService((req as any).user.id, req.body);
+    const user = await updateUserService({ userId: (req as any).user.id, userData: req.body });
 
-    return res.json(user);
+    return res.status(200).json(user);
   } catch (error) {
     next(error);
   }
@@ -41,7 +34,7 @@ export const getUsersController: RequestHandler = async (req, res, next) => {
   try {
     const users = await getUsersService();
 
-    return res.json(users);
+    return res.status(200).json(users);
   } catch (error) {
     next(error);
   }

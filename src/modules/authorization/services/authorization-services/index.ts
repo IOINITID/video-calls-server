@@ -17,15 +17,17 @@ export const registrationService = async (payload: { email: string; name: string
   try {
     const { email, name, password } = payload;
 
+    console.log({ email, name, password });
+
     // NOTE: Пользователь который уже зарегистрирован
-    const existingUser = await userModel.findOne({ email: payload.email });
+    const existingUser = await userModel.findOne({ email });
 
     if (existingUser) {
-      throw ApiError.BadRequest(`Пользователь с почтовым адресом ${payload.email} уже существует.`);
+      throw ApiError.BadRequest(`Пользователь с почтовым адресом ${email} уже существует.`);
     }
 
     // NOTE: Захешированный пароль для хранения в БД
-    const hashedPassword = await bcrypt.hash(password, 3);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     // NOTE: Hash ссылки для активации
     // const activationLink = nanoid();
@@ -56,13 +58,15 @@ export const registrationService = async (payload: { email: string; name: string
  */
 export const authorizationService = async (payload: { email: string; password: string }) => {
   try {
-    const user = await userModel.findOne({ email: payload.email });
+    const { email, password } = payload;
+
+    const user = await userModel.findOne({ email });
 
     if (!user) {
       throw ApiError.BadRequest('Пользователь с таким email не найден.');
     }
 
-    const isPasswordEquals = await bcrypt.compare(payload.password, user.password);
+    const isPasswordEquals = await bcrypt.compare(password, user.password);
 
     if (!isPasswordEquals) {
       throw ApiError.BadRequest('Пароль не верный.');
@@ -85,14 +89,16 @@ export const authorizationService = async (payload: { email: string; password: s
  */
 export const refreshService = async (payload: { refreshToken: string }) => {
   try {
-    if (!payload.refreshToken) {
+    const { refreshToken } = payload;
+
+    if (!refreshToken) {
       throw ApiError.UnauthorizedErrors();
     }
 
     // TODO: Добавить тип для id пользователя
-    const authorizationData: any = validateRefreshToken(payload.refreshToken);
+    const authorizationData: any = validateRefreshToken(refreshToken);
 
-    const tokenFromDB = await findToken(payload.refreshToken);
+    const tokenFromDB = await findToken(refreshToken);
 
     if (!authorizationData || !tokenFromDB) {
       throw ApiError.UnauthorizedErrors();
@@ -121,7 +127,9 @@ export const refreshService = async (payload: { refreshToken: string }) => {
  */
 export const logoutService = async (payload: { refreshToken: string }) => {
   try {
-    await removeToken(payload.refreshToken);
+    const { refreshToken } = payload;
+
+    await removeToken(refreshToken);
   } catch (error) {
     throw error;
   }

@@ -9,8 +9,7 @@ const disconnectSocket = (io: Server, socket: Socket) => {
       const user = await userModel.findOne({ socket_id: socket.id });
 
       if (!user) {
-        // throw ApiError.BadRequest('Пользователь не найден.');
-        return;
+        throw ApiError.BadRequest('Пользователь не найден.');
       }
 
       user.status = 'offline';

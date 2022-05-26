@@ -2,16 +2,6 @@ import { ApiError } from 'core/exeptions';
 import { UserModel, userModel } from 'modules/user/models/user-model';
 import bcrypt from 'bcrypt';
 import { getUserDTO, getUsersDTO } from 'modules/user/dtos';
-import { nanoid } from 'nanoid';
-import {
-  findToken,
-  generateTokens,
-  removeToken,
-  saveToken,
-  validateRefreshToken,
-} from 'modules/authorization/services/token-services';
-import { API_URL } from 'core/constants';
-import { mailActivationService } from 'modules/user/services/mail-services';
 import { v2 as cloudinary } from 'cloudinary';
 import { getAverageColor } from 'fast-average-color-node';
 
@@ -24,9 +14,11 @@ cloudinary.config({
 /**
  * Service для получения данных пользователя.
  */
-export const getUserService = async (userId: string) => {
+export const getUserService = async (payload: { userId: string }) => {
   try {
-    const user = await userModel.findOne({ _id: userId });
+    const { userId } = payload;
+
+    const user = await userModel.findById(userId);
 
     if (!user) {
       throw ApiError.BadRequest('Пользователь не найден.');
@@ -41,9 +33,11 @@ export const getUserService = async (userId: string) => {
 /**
  * Service для обновления данных пользователя.
  */
-export const updateUserService = async (userId: string, userData: Partial<UserModel>) => {
+export const updateUserService = async (payload: { userId: string; userData: Partial<UserModel> }) => {
   try {
-    const user = await userModel.findOne({ id: userId });
+    const { userId, userData } = payload;
+
+    const user = await userModel.findById(userId);
 
     if (!user) {
       throw ApiError.BadRequest('Пользователь не найден.');

@@ -29,12 +29,12 @@ app.use(
     origin: CORS_ORIGIN,
   })
 );
-app.use('/api/authorization', authorizationRouter);
-app.use('/api/users', userRouter);
+app.use('/api', authorizationRouter);
+app.use('/api', userRouter);
 app.use(isErrorMiddleware);
 
 app.get('/', (req, res, next) => {
-  return res.json({ status: 'online' });
+  return res.status(200).json({ status: 'online' });
 });
 
 io.on('connection', (socket) => connectionSocket(io, socket)); // CONNECTION - событие подключения к сокету

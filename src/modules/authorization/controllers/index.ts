@@ -16,6 +16,9 @@ export const registrationController: RequestHandler = async (req, res, next) => 
     // NOTE: Время истечения refresh токена 30 дней
     const MAX_AGE = 30 * 24 * 60 * 60 * 1000;
 
+    // NOTE: Данные которые ввел пользователь при регистрации
+    const { email, name, password } = req.body;
+
     // NOTE: Результат валидации данных которые ввел пользователь при регистрации
     const errors = validationResult(req);
 
@@ -23,9 +26,6 @@ export const registrationController: RequestHandler = async (req, res, next) => 
     if (!errors.isEmpty()) {
       return next(ApiError.BadRequest('Ошибка при валидации.', errors.array()));
     }
-
-    // NOTE: Данные которые ввел пользователь при регистрации
-    const { email, name, password } = req.body;
 
     // NOTE: Данные для авторизации, access и refresh токены.
     const registrationData = await registrationService({ email, name, password });
@@ -52,16 +52,21 @@ export const authorizationController: RequestHandler = async (req, res, next) =>
     // NOTE: Время истечения refresh токена 30 дней
     const MAX_AGE = 30 * 24 * 60 * 60 * 1000;
 
-    const authorizationData = await authorizationService({ email: req.body.email, password: req.body.password });
+    // NOTE: Данные которые ввел пользователь при авторизации
+    const { email, password } = req.body;
 
-    res.cookie('refresh_token', authorizationData.refreshToken, {
+    // NOTE: Данные для авторизации, access и refresh токены.
+    const { accessToken, refreshToken } = await authorizationService({ email, password });
+
+    // TODO: Разобраться с Same-Site='NONE' заголовками для установку cookie в ответе из heroku
+    res.cookie('refresh_token', refreshToken, {
       maxAge: MAX_AGE,
       httpOnly: true,
       sameSite: 'none',
       secure: true,
     });
 
-    return res.status(200).json({ access_token: authorizationData.accessToken });
+    return res.status(200).json({ access_token: accessToken });
   } catch (error) {
     next(error);
   }
@@ -72,19 +77,24 @@ export const authorizationController: RequestHandler = async (req, res, next) =>
  */
 export const refreshController: RequestHandler = async (req, res, next) => {
   try {
+    // NOTE: Данные refresh токена из cookies
+    const { refresh_token } = req.cookies;
+
     // NOTE: Время истечения refresh токена 30 дней
     const MAX_AGE = 30 * 24 * 60 * 60 * 1000;
 
-    const authorizationData = await refreshService({ refreshToken: req.cookies.refresh_token });
+    // NOTE: Данные для авторизации, access и refresh токены.
+    const { accessToken, refreshToken } = await refreshService({ refreshToken: refresh_token });
 
-    res.cookie('refresh_token', authorizationData.refreshToken, {
+    // TODO: Разобраться с Same-Site='NONE' заголовками для установку cookie в ответе из heroku
+    res.cookie('refresh_token', refreshToken, {
       maxAge: MAX_AGE,
       httpOnly: true,
       sameSite: 'none',
       secure: true,
     });
 
-    return res.status(200).json({ access_token: authorizationData.accessToken });
+    return res.status(200).json({ access_token: accessToken });
   } catch (error) {
     next(error);
   }
@@ -95,8 +105,13 @@ export const refreshController: RequestHandler = async (req, res, next) => {
  */
 export const logoutController: RequestHandler = async (req, res, next) => {
   try {
-    await logoutService({ refreshToken: req.cookies.refresh_token });
+    // NOTE: Данные refresh токена из cookies
+    const { refresh_token } = req.cookies;
 
+    // NOTE: Удаление refresh токена из БД
+    await logoutService({ refreshToken: refresh_token });
+
+    // NOTE: Удаление refresh токена из cookies
     res.clearCookie('refresh_token');
 
     return res.status(200).end();

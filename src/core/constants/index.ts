@@ -17,3 +17,5 @@ export const JWT_SECRET: string = process.env.JWT_SECRET || '';
 export const JWT_ACCESS_SECRET: string = process.env.JWT_ACCESS_SECRET || '';
 export const JWT_REFRESH_SECRET: string = process.env.JWT_REFRESH_SECRET || '';
 export const CORS_ORIGIN: string = process.env.CORS_ORIGIN || '';
+// NOTE: Локальная база данных в Docker
+// export const MONGO_URL = `mongodb://root:password@localhost:27017/video-calls?authSource=admin`;
