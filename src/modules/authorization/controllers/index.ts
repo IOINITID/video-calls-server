@@ -6,7 +6,7 @@ import {
   logoutService,
   refreshService,
   registrationService,
-} from '../services/authorization-services';
+} from 'modules/authorization/services/authorization-services';
 
 /**
  * Controller для регистрации пользователя.
@@ -14,7 +14,7 @@ import {
 export const registrationController: RequestHandler = async (req, res, next) => {
   try {
     // NOTE: Время истечения refresh токена 30 дней
-    const MAX_AGE = 30 * 24 * 60 * 60 * 1000;
+    // const MAX_AGE = 30 * 24 * 60 * 60 * 1000;
 
     // NOTE: Данные которые ввел пользователь при регистрации
     const { email, name, password } = req.body;
@@ -28,17 +28,17 @@ export const registrationController: RequestHandler = async (req, res, next) => 
     }
 
     // NOTE: Данные для авторизации, access и refresh токены.
-    const registrationData = await registrationService({ email, name, password });
+    const { accessToken, refreshToken } = await registrationService({ email, name, password });
 
     // TODO: Разобраться с Same-Site='NONE' заголовками для установку cookie в ответе из heroku
-    res.cookie('refresh_token', registrationData.refreshToken, {
-      maxAge: MAX_AGE,
-      httpOnly: true,
-      sameSite: 'none',
-      secure: true,
-    });
+    // res.cookie('refresh_token', refreshToken, {
+    //   maxAge: MAX_AGE,
+    //   httpOnly: true,
+    //   sameSite: 'none',
+    //   secure: true,
+    // });
 
-    return res.status(200).json({ access_token: registrationData.accessToken });
+    return res.status(200).json({ access_token: accessToken, refresh_token: refreshToken });
   } catch (error) {
     next(error);
   }
@@ -50,7 +50,7 @@ export const registrationController: RequestHandler = async (req, res, next) => 
 export const authorizationController: RequestHandler = async (req, res, next) => {
   try {
     // NOTE: Время истечения refresh токена 30 дней
-    const MAX_AGE = 30 * 24 * 60 * 60 * 1000;
+    // const MAX_AGE = 30 * 24 * 60 * 60 * 1000;
 
     // NOTE: Данные которые ввел пользователь при авторизации
     const { email, password } = req.body;
@@ -59,14 +59,14 @@ export const authorizationController: RequestHandler = async (req, res, next) =>
     const { accessToken, refreshToken } = await authorizationService({ email, password });
 
     // TODO: Разобраться с Same-Site='NONE' заголовками для установку cookie в ответе из heroku
-    res.cookie('refresh_token', refreshToken, {
-      maxAge: MAX_AGE,
-      httpOnly: true,
-      sameSite: 'none',
-      secure: true,
-    });
+    // res.cookie('refresh_token', refreshToken, {
+    //   maxAge: MAX_AGE,
+    //   httpOnly: true,
+    //   sameSite: 'none',
+    //   secure: true,
+    // });
 
-    return res.status(200).json({ access_token: accessToken });
+    return res.status(200).json({ access_token: accessToken, refresh_token: refreshToken });
   } catch (error) {
     next(error);
   }
@@ -78,23 +78,23 @@ export const authorizationController: RequestHandler = async (req, res, next) =>
 export const refreshController: RequestHandler = async (req, res, next) => {
   try {
     // NOTE: Данные refresh токена из cookies
-    const { refresh_token } = req.cookies;
+    const { refresh_token } = req.body;
 
     // NOTE: Время истечения refresh токена 30 дней
-    const MAX_AGE = 30 * 24 * 60 * 60 * 1000;
+    // const MAX_AGE = 30 * 24 * 60 * 60 * 1000;
 
     // NOTE: Данные для авторизации, access и refresh токены.
     const { accessToken, refreshToken } = await refreshService({ refreshToken: refresh_token });
 
     // TODO: Разобраться с Same-Site='NONE' заголовками для установку cookie в ответе из heroku
-    res.cookie('refresh_token', refreshToken, {
-      maxAge: MAX_AGE,
-      httpOnly: true,
-      sameSite: 'none',
-      secure: true,
-    });
+    // res.cookie('refresh_token', refreshToken, {
+    //   maxAge: MAX_AGE,
+    //   httpOnly: true,
+    //   sameSite: 'none',
+    //   secure: true,
+    // });
 
-    return res.status(200).json({ access_token: accessToken });
+    return res.status(200).json({ access_token: accessToken, refresh_token: refreshToken });
   } catch (error) {
     next(error);
   }

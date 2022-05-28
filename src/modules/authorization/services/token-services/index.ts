@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
-import { JWT_ACCESS_SECRET, JWT_REFRESH_SECRET } from '../../../../core/constants';
-import { tokenModel } from '../../models/token-model';
+import { JWT_ACCESS_SECRET, JWT_REFRESH_SECRET } from 'core/constants';
+import { tokenModel } from 'modules/authorization/models/token-model';
 
 dotenv.config();
 

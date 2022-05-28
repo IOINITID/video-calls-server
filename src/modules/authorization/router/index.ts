@@ -37,7 +37,7 @@ authorizationRouter.post('/authorization', authorizationController);
 /**
  * Route для обновления токенов.
  */
-authorizationRouter.get('/refresh', refreshController);
+authorizationRouter.post('/refresh', refreshController);
 
 /**
  * Route для выхода из аккаунта.
