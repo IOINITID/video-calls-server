@@ -1,6 +1,5 @@
 import bcrypt from 'bcrypt';
 import { ApiError } from 'core/exeptions';
-import { userModel } from 'modules/user/models/user-model';
 import {
   findToken,
   generateTokens,
