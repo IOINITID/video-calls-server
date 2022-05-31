@@ -3,13 +3,14 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
-import { CORS_ORIGIN, MONGO_URL, PORT } from 'core/constants';
+import { CORS_ORIGIN, PORT } from 'core/constants';
 import { isErrorMiddleware } from 'core/middlewares';
 import { Server } from 'socket.io';
 import http from 'http';
 import { connectionSocket } from 'core/sockets';
 import { userRouter } from 'modules/user/router';
 import { authorizationRouter } from 'modules/authorization/router';
+import { pool } from 'core/utils';
 
 dotenv.config();
 
@@ -39,9 +40,22 @@ app.get('/', (req, res, next) => {
 
 io.on('connection', (socket) => connectionSocket(io, socket)); // CONNECTION - событие подключения к сокету
 
+// const startServer = async () => {
+//   try {
+//     await mongoose.connect(MONGO_URL);
+
+//     server.listen(PORT, () => {
+//       console.log(`Server start on port ${PORT}...`);
+//     });
+//   } catch (error) {
+//     console.log('Some error...');
+//     console.log(error);
+//   }
+// };
+
 const startServer = async () => {
   try {
-    await mongoose.connect(MONGO_URL);
+    // await pool.connect();
 
     server.listen(PORT, () => {
       console.log(`Server start on port ${PORT}...`);

@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt';
 import { getUserDTO, getUsersDTO } from 'modules/user/dtos';
 import { v2 as cloudinary } from 'cloudinary';
 import { getAverageColor } from 'fast-average-color-node';
+import { pool } from 'core/utils';
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,
@@ -18,13 +19,14 @@ export const getUserService = async (payload: { userId: string }) => {
   try {
     const { userId } = payload;
 
-    const user = await userModel.findById(userId);
+    // const user = await userModel.findById(userId);
+    const user = await pool.query('SELECT * FROM users WHERE id = $1', [userId]);
 
-    if (!user) {
+    if (!user.rows[0]) {
       throw ApiError.BadRequest('Пользователь не найден.');
     }
 
-    return getUserDTO(user);
+    return getUserDTO(user.rows[0]);
   } catch (error) {
     throw error;
   }
@@ -37,14 +39,15 @@ export const updateUserService = async (payload: { userId: string; userData: Par
   try {
     const { userId, userData } = payload;
 
-    const user = await userModel.findById(userId);
+    // const user = await userModel.findById(userId);
+    const user = await pool.query('SELECT * FROM users WHERE id = $1', [userId]);
 
-    if (!user) {
+    if (!user.rows[0]) {
       throw ApiError.BadRequest('Пользователь не найден.');
     }
 
     if (userData.name && userData.password) {
-      const isPasswordEquals = await bcrypt.compare(userData.password, user.password);
+      const isPasswordEquals = await bcrypt.compare(userData.password, user.rows[0].password);
 
       if (!isPasswordEquals) {
         throw ApiError.BadRequest('Пароль не верный.');
@@ -52,12 +55,13 @@ export const updateUserService = async (payload: { userId: string; userData: Par
 
       // NOTE: Обновление имени пользователя
       if (userData.name) {
-        user.name = userData.name;
+        // user.name = userData.name;
+        await pool.query('UPDATE users SET name = $1 WHERE id = $2', [userData.name, userId]);
       }
     }
 
     if (userData.email && userData.password) {
-      const isPasswordEquals = await bcrypt.compare(userData.password, user.password);
+      const isPasswordEquals = await bcrypt.compare(userData.password, user.rows[0].password);
 
       if (!isPasswordEquals) {
         throw ApiError.BadRequest('Пароль не верный.');
@@ -65,18 +69,21 @@ export const updateUserService = async (payload: { userId: string; userData: Par
 
       // NOTE: Обновление адреса электронной почты пользователя
       if (userData.email) {
-        user.email = userData.email;
+        // user.email = userData.email;
+        await pool.query('UPDATE users SET email = $1 WHERE id = $2', [userData.email, userId]);
       }
     }
 
     // NOTE: Обновление описания пользователя
     if (userData.description) {
-      user.description = userData.description;
+      // user.description = userData.description;
+      await pool.query('UPDATE users SET description = $1 WHERE id = $2', [userData.description, userId]);
     }
 
     // NOTE: Обновление цвета пользователя
     if (userData.color) {
-      user.color = userData.color;
+      // user.color = userData.color;
+      await pool.query('UPDATE users SET color = $1  WHERE id = $2', [userData.color, userId]);
     }
 
     // NOTE: Обновления изображения пользователя
@@ -88,16 +95,22 @@ export const updateUserService = async (payload: { userId: string; userData: Par
 
       const averageColor = await getAverageColor(userData.image);
 
-      user.image = uploadedResponse.eager[0].secure_url;
-      user.color = averageColor.hex;
+      await pool.query('UPDATE users SET image = $1 WHERE id = $2', [uploadedResponse.eager[0].secure_url, userId]);
+      await pool.query('UPDATE users SET color = $1 WHERE id = $2', [averageColor.hex, userId]);
+      // user.image = uploadedResponse.eager[0].secure_url;
+      // user.color = averageColor.hex;
     } else if (userData.image === '') {
-      user.image = '';
-      user.color = '';
+      await pool.query('UPDATE users SET image = $1 WHERE id = $2', ['', userId]);
+      await pool.query('UPDATE users SET color = $1 WHERE id = $2', ['', userId]);
+      // user.image = '';
+      // user.color = '';
     }
 
-    await user.save();
+    // await user.save();
 
-    return getUserDTO(user);
+    const udpatedUser = await pool.query('SELECT * FROM users WHERE id = $1', [userId]);
+
+    return getUserDTO(udpatedUser.rows[0]);
   } catch (error) {
     throw error;
   }
@@ -108,8 +121,9 @@ export const updateUserService = async (payload: { userId: string; userData: Par
  */
 export const getUsersService = async () => {
   try {
-    const users = await userModel.find();
-    const usersData = getUsersDTO(users);
+    // const users = await userModel.find();
+    const users = await pool.query('SELECT * FROM users ORDER BY created_at');
+    const usersData = getUsersDTO(users.rows);
 
     return usersData;
   } catch (error) {
@@ -120,16 +134,16 @@ export const getUsersService = async () => {
 /**
  * Service для получения списка пользователей.
  */
-export const userUsersService = async (searchValue: string) => {
-  try {
-    if (!searchValue) {
-      return [];
-    }
+// export const userUsersService = async (searchValue: string) => {
+//   try {
+//     if (!searchValue) {
+//       return [];
+//     }
 
-    const users = await userModel.find({ name: { $regex: searchValue } });
+//     const users = await userModel.find({ name: { $regex: searchValue } });
 
-    return users;
-  } catch (error) {
-    throw error;
-  }
-};
+//     return users;
+//   } catch (error) {
+//     throw error;
+//   }
+// };

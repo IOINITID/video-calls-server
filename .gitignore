@@ -11,6 +11,8 @@ Thumbs.db
 *.log*
 node_modules/
 .env
+.env.development
+.env.production
 
 # Build files
 public/

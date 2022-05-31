@@ -9,6 +9,8 @@ import {
   validateRefreshToken,
 } from 'modules/authorization/services/token-services';
 import { getAuthorizationDTO } from '../../dtos';
+import { pool } from 'core/utils';
+import { getDefaultColor } from 'modules/user/utils';
 
 /**
  * Service для регистрации пользователя.
@@ -17,12 +19,14 @@ export const registrationService = async (payload: { email: string; name: string
   try {
     const { email, name, password } = payload;
 
-    console.log({ email, name, password });
+    // console.log({ email, name, password });
 
     // NOTE: Пользователь который уже зарегистрирован
-    const existingUser = await userModel.findOne({ email });
+    // const existingUser = await userModel.findOne({ email });
+    const existingUser = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    // await pool.end();
 
-    if (existingUser) {
+    if (existingUser.rows[0]) {
       throw ApiError.BadRequest(`Пользователь с почтовым адресом ${email} уже существует.`);
     }
 
@@ -33,13 +37,19 @@ export const registrationService = async (payload: { email: string; name: string
     // const activationLink = nanoid();
 
     // NOTE: Созданный пользователь
-    const user = await userModel.create({ email, name, password: hashedPassword });
+    const user = await pool.query(
+      'INSERT INTO users (name, email, password, color) VALUES ($1, $2, $3, $4) RETURNING *',
+      [name, email, hashedPassword, getDefaultColor()]
+    );
+    // await pool.end();
+
+    console.log({ user: user.rows[0] });
 
     // TODO: Ошибка в сервисе отправки писем
     // await mailActivationService(email, `${API_URL}/api/activate/${activationLink}`);
 
     // NOTE: Данные для авторизации, которые будут добавлены в токен
-    const authorizationDTO = getAuthorizationDTO(user);
+    const authorizationDTO = getAuthorizationDTO(user.rows[0]);
 
     // NOTE: Access и refresh токены
     const tokens = generateTokens(authorizationDTO);
@@ -60,19 +70,20 @@ export const authorizationService = async (payload: { email: string; password: s
   try {
     const { email, password } = payload;
 
-    const user = await userModel.findOne({ email });
+    // const user = await userModel.findOne({ email });
+    const user = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
 
-    if (!user) {
+    if (!user.rows[0]) {
       throw ApiError.BadRequest('Пользователь с таким email не найден.');
     }
 
-    const isPasswordEquals = await bcrypt.compare(password, user.password);
+    const isPasswordEquals = await bcrypt.compare(password, user.rows[0].password);
 
     if (!isPasswordEquals) {
       throw ApiError.BadRequest('Пароль не верный.');
     }
 
-    const authorizationDTO = getAuthorizationDTO(user);
+    const authorizationDTO = getAuthorizationDTO(user.rows[0]);
 
     const tokens = generateTokens(authorizationDTO);
 
@@ -104,13 +115,14 @@ export const refreshService = async (payload: { refreshToken: string }) => {
       throw ApiError.UnauthorizedErrors();
     }
 
-    const user = await userModel.findById(authorizationData.id);
+    // const user = await userModel.findById(authorizationData.id);
+    const user = await pool.query('SELECT * FROM users WHERE id = $1', [authorizationData.id]);
 
-    if (!user) {
+    if (!user.rows[0]) {
       throw ApiError.BadRequest('Пользователь не найден.');
     }
 
-    const authorizationDTO = getAuthorizationDTO(user);
+    const authorizationDTO = getAuthorizationDTO(user.rows[0]);
 
     const tokens = generateTokens(authorizationDTO);
 
