@@ -1,7 +1,6 @@
 import express, { json } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
 import { CORS_ORIGIN, PORT } from 'core/constants';
 import { isErrorMiddleware } from 'core/middlewares';
