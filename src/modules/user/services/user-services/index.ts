@@ -130,20 +130,3 @@ export const getUsersService = async () => {
     throw error;
   }
 };
-
-/**
- * Service для получения списка пользователей.
- */
-// export const userUsersService = async (searchValue: string) => {
-//   try {
-//     if (!searchValue) {
-//       return [];
-//     }
-
-//     const users = await userModel.find({ name: { $regex: searchValue } });
-
-//     return users;
-//   } catch (error) {
-//     throw error;
-//   }
-// };

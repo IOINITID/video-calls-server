@@ -9,7 +9,6 @@ import http from 'http';
 import { connectionSocket } from 'core/sockets';
 import { userRouter } from 'modules/user/router';
 import { authorizationRouter } from 'modules/authorization/router';
-import { pool } from 'core/utils';
 
 dotenv.config();
 
