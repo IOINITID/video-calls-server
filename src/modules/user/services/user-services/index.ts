@@ -19,7 +19,6 @@ export const getUserService = async (payload: { userId: string }) => {
   try {
     const { userId } = payload;
 
-    // const user = await userModel.findById(userId);
     const user = await pool.query('SELECT * FROM users WHERE id = $1', [userId]);
 
     if (!user.rows[0]) {
@@ -39,7 +38,6 @@ export const updateUserService = async (payload: { userId: string; userData: Par
   try {
     const { userId, userData } = payload;
 
-    // const user = await userModel.findById(userId);
     const user = await pool.query('SELECT * FROM users WHERE id = $1', [userId]);
 
     if (!user.rows[0]) {
@@ -55,7 +53,6 @@ export const updateUserService = async (payload: { userId: string; userData: Par
 
       // NOTE: Обновление имени пользователя
       if (userData.name) {
-        // user.name = userData.name;
         await pool.query('UPDATE users SET name = $1 WHERE id = $2', [userData.name, userId]);
       }
     }
@@ -69,20 +66,17 @@ export const updateUserService = async (payload: { userId: string; userData: Par
 
       // NOTE: Обновление адреса электронной почты пользователя
       if (userData.email) {
-        // user.email = userData.email;
         await pool.query('UPDATE users SET email = $1 WHERE id = $2', [userData.email, userId]);
       }
     }
 
     // NOTE: Обновление описания пользователя
     if (userData.description) {
-      // user.description = userData.description;
       await pool.query('UPDATE users SET description = $1 WHERE id = $2', [userData.description, userId]);
     }
 
     // NOTE: Обновление цвета пользователя
     if (userData.color) {
-      // user.color = userData.color;
       await pool.query('UPDATE users SET color = $1  WHERE id = $2', [userData.color, userId]);
     }
 
@@ -97,16 +91,10 @@ export const updateUserService = async (payload: { userId: string; userData: Par
 
       await pool.query('UPDATE users SET image = $1 WHERE id = $2', [uploadedResponse.eager[0].secure_url, userId]);
       await pool.query('UPDATE users SET color = $1 WHERE id = $2', [averageColor.hex, userId]);
-      // user.image = uploadedResponse.eager[0].secure_url;
-      // user.color = averageColor.hex;
     } else if (userData.image === '') {
       await pool.query('UPDATE users SET image = $1 WHERE id = $2', ['', userId]);
       await pool.query('UPDATE users SET color = $1 WHERE id = $2', ['', userId]);
-      // user.image = '';
-      // user.color = '';
     }
-
-    // await user.save();
 
     const udpatedUser = await pool.query('SELECT * FROM users WHERE id = $1', [userId]);
 
@@ -121,7 +109,6 @@ export const updateUserService = async (payload: { userId: string; userData: Par
  */
 export const getUsersService = async () => {
   try {
-    // const users = await userModel.find();
     const users = await pool.query('SELECT * FROM users ORDER BY created_at');
     const usersData = getUsersDTO(users.rows);
 
