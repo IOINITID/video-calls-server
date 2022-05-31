@@ -1,5 +1,5 @@
 import { ApiError } from 'core/exeptions';
-import { UserModel, userModel } from 'modules/user/models/user-model';
+import { UserModel } from 'modules/user/models/user-model';
 import bcrypt from 'bcrypt';
 import { getUserDTO, getUsersDTO } from 'modules/user/dtos';
 import { v2 as cloudinary } from 'cloudinary';
