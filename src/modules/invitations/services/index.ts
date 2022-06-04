@@ -148,13 +148,13 @@ export const getInvitationsService = async (payload: { user_id: string }) => {
 
     // NOTE: Список пользователей которым отправлены приглашения в друзья
     const sentInvitations = await pool.query(
-      'SELECT * FROM users INNER JOIN invitations ON users.id = invitations.sent_invitation_id WHERE invitations.user_id = $1 ORDER BY users.created_at',
+      'SELECT users.* FROM users INNER JOIN invitations ON users.id = invitations.sent_invitation_id WHERE invitations.user_id = $1 ORDER BY users.created_at',
       [user_id]
     );
 
     // NOTE: Список пользователей от которых получены приглашения в друзья
     const receivedInvitations = await pool.query(
-      'SELECT * FROM users INNER JOIN invitations ON users.id = invitations.received_invitation_id WHERE invitations.user_id = $1 ORDER BY users.created_at',
+      'SELECT users.* FROM users INNER JOIN invitations ON users.id = invitations.received_invitation_id WHERE invitations.user_id = $1 ORDER BY users.created_at',
       [user_id]
     );
 

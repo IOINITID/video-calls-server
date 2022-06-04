@@ -114,7 +114,7 @@ export const removeFromFriendsService = async (payload: { user_id: string; frien
     ]);
 
     // NOTE: Проверка на то, что пользователь которого хотят удалить из друзей, находится в друзьях
-    if (existingFriendInFriends.rows[0]) {
+    if (!existingFriendInFriends.rows[0]) {
       throw ApiError.BadRequest('Пользователь не находится у вас в друзьях.');
     }
 
@@ -152,7 +152,7 @@ export const getFriendsService = async (payload: { user_id: string }) => {
 
     // NOTE: Список друзей пользователя
     const friends = await pool.query(
-      'SELECT * FROM users INNER JOIN friends ON users.id = friends.friend_id WHERE friends.user_id = $1 ORDER BY users.created_at',
+      'SELECT users.* FROM users INNER JOIN friends ON users.id = friends.friend_id WHERE friends.user_id = $1 ORDER BY users.created_at',
       [user_id]
     );
 
