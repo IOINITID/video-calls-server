@@ -9,6 +9,7 @@ import http from 'http';
 import { connectionSocket } from 'core/sockets';
 import { userRouter } from 'modules/user/router';
 import { authorizationRouter } from 'modules/authorization/router';
+import { invitationsRouter } from 'modules/invitations/router';
 
 dotenv.config();
 
@@ -30,6 +31,7 @@ app.use(
 );
 app.use('/api', authorizationRouter);
 app.use('/api', userRouter);
+app.use('/api', invitationsRouter);
 app.use(isErrorMiddleware);
 
 app.get('/', (req, res, next) => {
