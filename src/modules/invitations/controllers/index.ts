@@ -4,7 +4,7 @@ import {
   declineInvitationService,
   getInvitationsService,
   sentInvitationService,
-} from '../services';
+} from 'modules/invitations/services';
 
 /**
  * Controller для отправки приглашения в друзья.

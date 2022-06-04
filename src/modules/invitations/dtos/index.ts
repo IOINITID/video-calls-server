@@ -1,10 +1,6 @@
-import { UserModel } from 'modules/user/models/user-model';
-
 /**
- * DTO for authorization.
+ * DTO для пользователей, которые отправилk или получили приглашения в друзья..
  */
-export const getAuthorizationDTO = (userModel: UserModel) => {
-  return {
-    id: userModel.id,
-  };
+export const getUsersForInvitationsDTO = () => {
+  return {};
 };
