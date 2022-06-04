@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { isAuthorizatedMiddleware } from 'core/middlewares';
 import {
-  confirmInvitationController,
   declineInvitationController,
   getInvitationsController,
   sentInvitationController,
@@ -16,11 +15,6 @@ const invitationsRouter = Router();
  * Route для отправки приглашения в друзья.
  */
 invitationsRouter.post('/invitations/sent', isAuthorizatedMiddleware, sentInvitationController);
-
-/**
- * Route для принятия приглашения в друзья.
- */
-invitationsRouter.post('/invitations/confirm', isAuthorizatedMiddleware, confirmInvitationController);
 
 /**
  * Route для отклонения приглашения в друзья.
