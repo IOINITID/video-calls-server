@@ -107,9 +107,11 @@ export const updateUserService = async (payload: { userId: string; userData: Par
 /**
  * Service для получения списка пользователей.
  */
-export const getUsersService = async () => {
+export const getUsersService = async (payload: { user_id: string }) => {
   try {
-    const users = await pool.query('SELECT * FROM users ORDER BY created_at');
+    const { user_id } = payload;
+
+    const users = await pool.query('SELECT * FROM users WHERE id != $1 ORDER BY created_at', [user_id]);
     const usersData = getUsersDTO(users.rows);
 
     return usersData;

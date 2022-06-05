@@ -32,7 +32,7 @@ export const updateUserController: RequestHandler = async (req, res, next) => {
  */
 export const getUsersController: RequestHandler = async (req, res, next) => {
   try {
-    const users = await getUsersService();
+    const users = await getUsersService({ user_id: (req as any).user.id });
 
     return res.status(200).json(users);
   } catch (error) {
