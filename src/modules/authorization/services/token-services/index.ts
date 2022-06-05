@@ -15,27 +15,21 @@ export const generateTokens = (payload: any) => {
 };
 
 export const saveToken = async (user: string, refreshToken: string) => {
-  // const existingToken = await tokenModel.findOne({ user });
   const existingToken = await pool.query('SELECT * FROM tokens WHERE user_id = $1', [user]);
 
   if (existingToken.rows[0]) {
-    const updatedToken = await pool.query('UPDATE tokens SET refresh_token = $1 RETURNING refresh_token', [
-      refreshToken,
-    ]);
-    // existingToken.refresh_token = refreshToken;
+    const updatedToken = await pool.query(
+      'UPDATE tokens SET refresh_token = $1 WHERE user_id = $2 RETURNING refresh_token',
+      [refreshToken, user]
+    );
 
-    // return await existingToken.save();
     return updatedToken.rows[0];
   }
-
-  // const token = await tokenModel.create({ user, refresh_token: refreshToken });
 
   const token = await pool.query(
     'INSERT INTO tokens (user_id, refresh_token) VALUES ($1, $2) RETURNING refresh_token',
     [user, refreshToken]
   );
-
-  console.log({ token: token.rows[0] });
 
   return token.rows[0];
 };
@@ -62,7 +56,6 @@ export const validateRefreshToken = (token: string) => {
 
 export const removeToken = async (refreshToken: string) => {
   try {
-    // const tokenData = await tokenModel.deleteOne({ refresh_token: refreshToken });
     const tokenData = await pool.query('DELETE FROM tokens WHERE refresh_token = $1 RETURNING refresh_token', [
       refreshToken,
     ]);
@@ -77,7 +70,6 @@ export const removeToken = async (refreshToken: string) => {
 
 export const findToken = async (refreshToken: string) => {
   try {
-    // const tokenData = await tokenModel.findOne({ refresh_token: refreshToken });
     const tokenData = await pool.query('SELECT refresh_token FROM tokens WHERE refresh_token = $1', [refreshToken]);
 
     return tokenData.rows[0];

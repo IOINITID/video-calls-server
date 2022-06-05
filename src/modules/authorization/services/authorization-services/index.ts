@@ -18,10 +18,7 @@ export const registrationService = async (payload: { email: string; name: string
   try {
     const { email, name, password } = payload;
 
-    // console.log({ email, name, password });
-
     // NOTE: Пользователь который уже зарегистрирован
-    // const existingUser = await userModel.findOne({ email });
     const existingUser = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
     // await pool.end();
 
@@ -69,7 +66,6 @@ export const authorizationService = async (payload: { email: string; password: s
   try {
     const { email, password } = payload;
 
-    // const user = await userModel.findOne({ email });
     const user = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
 
     if (!user.rows[0]) {
@@ -114,7 +110,6 @@ export const refreshService = async (payload: { refreshToken: string }) => {
       throw ApiError.UnauthorizedErrors();
     }
 
-    // const user = await userModel.findById(authorizationData.id);
     const user = await pool.query('SELECT * FROM users WHERE id = $1', [authorizationData.id]);
 
     if (!user.rows[0]) {
