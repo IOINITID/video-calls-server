@@ -1,31 +1,34 @@
 import { Server, Socket } from 'socket.io';
-import { ApiError } from '../exeptions';
-import { userModel } from 'modules/user/models/user-model';
 import { pool } from 'core/utils';
+import { ApiError } from '../exeptions';
+import { Event } from './constants';
 
 // DISCONNECT - событие отключение одного из пользователей
 const disconnectSocket = (io: Server, socket: Socket) => {
   socket.on('disconnect', async () => {
     try {
-      // const user = await userModel.findOne({ socket_id: socket.id });
+      // NOTE: Пользователь, который отключился
       const user = await pool.query('SELECT * FROM users WHERE socket_id = $1', [socket.id]);
 
+      // NOTE: Проверка на то, что пользователь который отключился зарегистрирован
       if (!user.rows[0]) {
-        throw ApiError.BadRequest('Пользователь не найден.');
+        throw ApiError.BadRequest('Пользователь который отключился не найден.');
       }
 
+      // NOTE: Обновление статуса пользователя, который отключился
       await pool.query('UPDATE users SET status = $1 WHERE socket_id = $2', ['offline', socket.id]);
+
+      // NOTE: Обновление ID сокета пользователя, который отключился
       await pool.query('UPDATE users SET socket_id = $1 WHERE socket_id = $2', ['', socket.id]);
 
-      // user.status = 'offline';
-      // user.socket_id = '';
+      // NOTE: Отправка только себе
+      socket.emit(Event.Server.Disconnect);
 
-      // await user.save();
+      // NOTE: Отправка всем подключенным клиентам кроме себя
+      socket.broadcast.emit(Event.Server.Disconnect);
 
-      // socket.emit('on-disconnect'); // Отправка только себе
-      // socket.broadcast.emit('on-disconnect'); // Отправка всем подключенным клиентам кроме себя
-
-      io.emit('on-disconnect'); // Отправка всем подключенным клиентам
+      // NOTE: // Отправка всем подключенным клиентам
+      io.emit(Event.Server.Disconnect);
     } catch (error) {
       console.error(error);
     }
