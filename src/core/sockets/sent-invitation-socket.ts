@@ -2,10 +2,12 @@ import { Server, Socket } from 'socket.io';
 import { pool } from 'core/utils';
 import { ApiError } from '../exeptions';
 import { getInvitationsService } from 'modules/invitations/services';
+import { Event } from './constants';
 
 // SENT-INVITATION - (кастомное событие) - событие отправки приглашения в друзья
 const sentInvitationSocket = (io: Server, socket: Socket) => {
-  socket.on('client:sent_invitation', async (userId: string, friendId: string) => {
+  // TODO: Добавить в константы список событий
+  socket.on(Event.Client.SentInvitation, async (userId: string, friendId: string) => {
     try {
       // NOTE: Пользователь который отправил приглашение в друзья
       const user = await pool.query('SELECT * FROM users WHERE id = $1', [userId]);
@@ -31,10 +33,10 @@ const sentInvitationSocket = (io: Server, socket: Socket) => {
       await getInvitationsService({ user_id: friendId });
 
       // NOTE: Отправка пользователю который отправил приглашение в друзья
-      socket.emit('server:sent_invitation');
+      socket.emit(Event.Server.SentInvitation);
 
       // NOTE: Отправка пользователю которому отправили приглашение в друзья
-      socket.to(friend.rows[0].socket_id).emit('server:sent_invitation');
+      socket.to(friend.rows[0].socket_id).emit(Event.Server.SentInvitation);
     } catch (error) {
       console.error(error);
     }
