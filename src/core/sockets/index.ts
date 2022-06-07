@@ -1,8 +1,8 @@
-export { onConnectSocket } from './on-connect-socket';
-export { onDisconnectSocket } from './on-disconnect-socket';
+export { connectSocket } from './connect-socket';
+export { userDisconnectSocket } from './user-disconnect-socket';
 export { disconnectSocket } from './disconnect-socket';
-export { onAddInviteToFriendsSocket } from './on-add-invite-to-friends-socket';
-export { onAddToFriendsSocket } from './on-add-to-friends-socket';
+export { sentInvitationSocket } from './sent-invitation-socket';
+export { addToFriendsSocket } from './add-to-friends-socket';
 export { onRemoveFromFriendsSocket } from './on-remove-from-friends-socket';
 export { onRemoveInviteToFriendsSocket } from './on-remove-invite-to-friends-socket';
 export { onChannelJoinSocket } from './on-channel-join-socket';

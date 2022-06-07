@@ -1,35 +1,35 @@
 import { Server, Socket } from 'socket.io';
 import {
   disconnectSocket,
-  onAddInviteToFriendsSocket,
-  onAddToFriendsSocket,
+  sentInvitationSocket,
+  addToFriendsSocket,
   onCallAnswerSocket,
   onCallEndSocket,
   onCallSocket,
   onChannelJoinSocket,
-  onConnectSocket,
-  onDisconnectSocket,
+  connectSocket,
+  userDisconnectSocket,
   onMessageSocket,
   onRemoveFromFriendsSocket,
   onRemoveInviteToFriendsSocket,
-} from '.';
+} from './index';
 
 // CONNECT - событие подключения к сокету
 const connectionSocket = (io: Server, socket: Socket) => {
-  // ON-CONNECT - (кастомное событие) - событие подключения клиента к сокету
-  onConnectSocket(io, socket);
+  // CONNECT - (кастомное событие) - событие подключения клиента к сокету
+  connectSocket(io, socket);
 
-  // ON-DISCONNECT - (кастомное событие) - событие отключения клиента от сокета
-  onDisconnectSocket(io, socket);
+  // USER-DISCONNECT - (кастомное событие) - событие отключения клиента от сокета
+  userDisconnectSocket(io, socket);
 
   // DISCONNECT - событие отключение одного из пользователей
   disconnectSocket(io, socket);
 
-  // ON-ADD-INVITE-TO-FRIENDS - (кастомное событие) - событие отправки приглашения в друзья пользователю
-  onAddInviteToFriendsSocket(io, socket);
+  // SENT-INVITATION - (кастомное событие) - событие отправки приглашения в друзья
+  sentInvitationSocket(io, socket);
 
-  // ON-ADD-TO-FRIENDS - (кастомное событие) - событие добавления в друзья пользователя
-  onAddToFriendsSocket(io, socket);
+  // ADD-TO-FRIENDS - (кастомное событие) - событие добавления в друзья
+  addToFriendsSocket(io, socket);
 
   // ON-REMOVE-FROM-FRIENDS - (кастомное событие) - событие удаление пользователя из друзей
   onRemoveFromFriendsSocket(io, socket);
