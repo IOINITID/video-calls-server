@@ -1,4 +1,7 @@
 export const Event = {
+  Default: {
+    Disconnect: 'disconnect',
+  },
   Client: {
     Connect: 'client:connect',
     Disconnect: 'client:disconnect',

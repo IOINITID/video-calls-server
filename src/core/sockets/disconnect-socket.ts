@@ -5,7 +5,7 @@ import { Event } from './constants';
 
 // DISCONNECT - событие отключение одного из пользователей
 const disconnectSocket = (io: Server, socket: Socket) => {
-  socket.on('disconnect', async () => {
+  socket.on(Event.Default.Disconnect, async () => {
     try {
       // NOTE: Пользователь, который отключился
       const user = await pool.query('SELECT * FROM users WHERE socket_id = $1', [socket.id]);
