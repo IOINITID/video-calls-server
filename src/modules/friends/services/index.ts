@@ -152,7 +152,7 @@ export const getFriendsService = async (payload: { user_id: string }) => {
 
     // NOTE: Список друзей пользователя
     const friends = await pool.query(
-      'SELECT users.* FROM users INNER JOIN friends ON users.id = friends.friend_id WHERE friends.user_id = $1 ORDER BY users.created_at',
+      "SELECT users.* FROM users INNER JOIN friends ON users.id = friends.friend_id WHERE friends.user_id = $1 ORDER BY CASE WHEN users.status = 'online' THEN 1 WHEN users.status = 'offline' THEN 2 END, users.created_at ASC",
       [user_id]
     );
 

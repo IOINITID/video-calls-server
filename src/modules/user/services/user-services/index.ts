@@ -111,7 +111,10 @@ export const getUsersService = async (payload: { user_id: string }) => {
   try {
     const { user_id } = payload;
 
-    const users = await pool.query('SELECT * FROM users WHERE id != $1 ORDER BY created_at', [user_id]);
+    const users = await pool.query(
+      "SELECT * FROM users WHERE id != $1 ORDER BY CASE WHEN users.status = 'online' THEN 1 WHEN users.status = 'offline' THEN 2 END, created_at ASC",
+      [user_id]
+    );
     const usersData = getUsersDTO(users.rows);
 
     return usersData;
