@@ -11,7 +11,7 @@ import {
   userDisconnectSocket,
   onMessageSocket,
   onRemoveFromFriendsSocket,
-  onRemoveInviteToFriendsSocket,
+  declineInvitationSocket,
 } from './index';
 
 // CONNECT - событие подключения к сокету
@@ -34,8 +34,8 @@ const connectionSocket = (io: Server, socket: Socket) => {
   // ON-REMOVE-FROM-FRIENDS - (кастомное событие) - событие удаление пользователя из друзей
   onRemoveFromFriendsSocket(io, socket);
 
-  // ON-REMOVE-INVITE-TO-FRIENDS - (кастомное событие) - событие отклонение приглашения в друзья
-  onRemoveInviteToFriendsSocket(io, socket);
+  // DECLINE-INVITATION-SOCKET - (кастомное событие) - событие отклонения приглашения в друзья
+  declineInvitationSocket(io, socket);
 
   // ON-CHANNEL-JOIN - (кастомное событие) - событие присоединение пользователя к каналу
   onChannelJoinSocket(io, socket);
