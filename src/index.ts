@@ -10,7 +10,8 @@ import { connectionSocket } from 'core/sockets';
 import { userRouter } from 'modules/user/router';
 import { authorizationRouter } from 'modules/authorization/router';
 import { invitationsRouter } from 'modules/invitations/router';
-import { freindsRouter } from 'modules/friends/router';
+import { friendsRouter } from 'modules/friends/router';
+import { Event } from 'core/sockets/constants';
 
 dotenv.config();
 
@@ -33,27 +34,17 @@ app.use(
 app.use('/api', authorizationRouter);
 app.use('/api', userRouter);
 app.use('/api', invitationsRouter);
-app.use('/api', freindsRouter);
+app.use('/api', friendsRouter);
 app.use(isErrorMiddleware);
 
 app.get('/', (req, res, next) => {
   return res.status(200).json({ status: 'online' });
 });
 
-io.on('connection', (socket) => connectionSocket(io, socket)); // CONNECTION - событие подключения к сокету
-
-// const startServer = async () => {
-//   try {
-//     await mongoose.connect(MONGO_URL);
-
-//     server.listen(PORT, () => {
-//       console.log(`Server start on port ${PORT}...`);
-//     });
-//   } catch (error) {
-//     console.log('Some error...');
-//     console.log(error);
-//   }
-// };
+// NOTE: CONNECTION - событие подключения к сокету
+io.on(Event.Default.Connection, (socket) => {
+  connectionSocket(io, socket);
+});
 
 const startServer = async () => {
   try {

@@ -1,6 +1,11 @@
 export const Event = {
   Default: {
+    Connection: 'connection',
+    ConnectError: 'connect_error',
     Disconnect: 'disconnect',
+    Disconnecting: 'disconnecting',
+    NewListener: 'newListener',
+    RemoveListener: 'removeListener',
   },
   Client: {
     Connect: 'client:connect',

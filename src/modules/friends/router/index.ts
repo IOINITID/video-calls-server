@@ -5,21 +5,21 @@ import { addToFriendsController, getFriendsController, removeFromFriendsControll
 /**
  * Router для модуля друзья.
  */
-const freindsRouter = Router();
+const friendsRouter = Router();
 
 /**
  * Route для добавления в друзья.
  */
-freindsRouter.post('/friends/add', isAuthorizatedMiddleware, addToFriendsController);
+friendsRouter.post('/friends/add', isAuthorizatedMiddleware, addToFriendsController);
 
 /**
  * Route для удаления из друзей.
  */
-freindsRouter.post('/friends/remove', isAuthorizatedMiddleware, removeFromFriendsController);
+friendsRouter.post('/friends/remove', isAuthorizatedMiddleware, removeFromFriendsController);
 
 /**
  * Route для получения списка друзей.
  */
-freindsRouter.get('/friends', isAuthorizatedMiddleware, getFriendsController);
+friendsRouter.get('/friends', isAuthorizatedMiddleware, getFriendsController);
 
-export { freindsRouter };
+export { friendsRouter };

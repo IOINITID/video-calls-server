@@ -1,7 +1,6 @@
 import { Server, Socket } from 'socket.io';
 import { pool } from 'core/utils';
 import { ApiError } from '../exeptions';
-import { getInvitationsService } from 'modules/invitations/services';
 import { Event } from './constants';
 
 // SENT-INVITATION - (кастомное событие) - событие отправки приглашения в друзья
