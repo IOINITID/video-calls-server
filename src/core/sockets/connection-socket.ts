@@ -16,6 +16,11 @@ import {
 
 // CONNECT - событие подключения к сокету
 const connectionSocket = (io: Server, socket: Socket) => {
+  // TODO: Доабвить отделый сокет
+  socket.on('client:ping', (timestamp: string) => {
+    socket.emit('server:ping', timestamp);
+  });
+
   // CONNECT - (кастомное событие) - событие подключения клиента к сокету
   connectSocket(io, socket);
 

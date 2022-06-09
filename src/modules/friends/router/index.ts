@@ -1,6 +1,11 @@
 import { Router } from 'express';
 import { isAuthorizatedMiddleware } from 'core/middlewares';
-import { addToFriendsController, getFriendsController, removeFromFriendsController } from 'modules/friends/controllers';
+import {
+  addToFriendsController,
+  getFriendsController,
+  getFriendsUsersController,
+  removeFromFriendsController,
+} from 'modules/friends/controllers';
 
 /**
  * Router для модуля друзья.
@@ -21,5 +26,10 @@ friendsRouter.post('/friends/remove', isAuthorizatedMiddleware, removeFromFriend
  * Route для получения списка друзей.
  */
 friendsRouter.get('/friends', isAuthorizatedMiddleware, getFriendsController);
+
+/**
+ * Route для получения списка друзей.
+ */
+friendsRouter.get('/friends/users', isAuthorizatedMiddleware, getFriendsUsersController);
 
 export { friendsRouter };

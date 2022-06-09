@@ -156,9 +156,103 @@ export const getFriendsService = async (payload: { user_id: string }) => {
       [user_id]
     );
 
-    // NOTE: Список друзей
     return { friends: friends.rows };
   } catch (error) {
     throw error;
   }
 };
+
+export const getFriendsUsersService = async (payload: { user_id: string }) => {
+  try {
+    // NOTE: ID пользователя который хочет получить список пользователей, которых можно добавить в друзья
+    const { user_id } = payload;
+
+    // NOTE: Пользователь который хочет получить список пользователей, которых можно добавить в друзья
+    const existingUser = await pool.query('SELECT * FROM users WHERE id = $1', [user_id]);
+
+    // NOTE: Проверка на то что пользователь который хочет получить список пользователей, которых можно добавить в друзья
+    if (!existingUser.rows[0]) {
+      throw ApiError.BadRequest(
+        'Пользователь который хочет получить список пользователей, которых можно добавить в друзья не найден.'
+      );
+    }
+
+    // NOTE: Список пользователей, которых можно добавить в друзья
+    const friendsUsers = await pool.query(
+      `
+SELECT users.*, invitations.sent_invitation, friends.add_to_friends FROM users LEFT JOIN (
+  SELECT *, CASE
+  WHEN sent_invitation_id IS NOT NULL THEN true
+  ELSE false
+  END AS sent_invitation FROM invitations
+  WHERE user_id = $1
+) AS invitations 
+ON users.id = invitations.sent_invitation_id 
+
+LEFT JOIN (
+  SELECT *, CASE
+  WHEN friend_id IS NOT NULL THEN true
+  ELSE false
+  END AS add_to_friends FROM friends
+  WHERE user_id = $1
+) AS friends
+ON users.id = friends.friend_id
+
+WHERE users.id != $1
+
+ORDER BY CASE
+WHEN users.status = 'online' THEN 1
+WHEN users.status = 'offline' THEN 2
+END, users.created_at ASC;
+`,
+      [user_id]
+    );
+
+    return { friends_users: friendsUsers.rows };
+  } catch (error) {
+    throw error;
+  }
+};
+
+// `
+// -- Объединение двух таблиц
+// SELECT users.*, invitations.sent_invitation FROM users LEFT JOIN (
+//     SELECT *, CASE
+//     WHEN sent_invitation_id IS NOT NULL THEN true
+//     ELSE false
+//     END AS sent_invitation FROM invitations
+//     WHERE user_id = '7c9ad0a7-b9d9-46fb-9562-79b00891a8cb'
+// ) AS invitations
+// ON users.id = invitations.sent_invitation_id
+// ORDER BY CASE
+// WHEN users.status = 'online' THEN 1
+// WHEN users.status = 'offline' THEN 2
+// END, users.created_at ASC;
+// `;
+
+// `
+// SELECT users.*, invitations.sent_invitation, friends.add_to_friends FROM users LEFT JOIN (
+//   SELECT *, CASE
+//   WHEN sent_invitation_id IS NOT NULL THEN true
+//   ELSE false
+//   END AS sent_invitation FROM invitations
+//   WHERE user_id = $1
+// ) AS invitations
+// ON users.id = invitations.sent_invitation_id
+
+// LEFT JOIN (
+//   SELECT *, CASE
+//   WHEN friend_id IS NOT NULL THEN true
+//   ELSE false
+//   END AS add_to_friends FROM friends
+//   WHERE user_id = $1
+// ) AS friends
+// ON users.id = friends.friend_id
+
+// WHERE users.id != $1
+
+// ORDER BY CASE
+// WHEN users.status = 'online' THEN 1
+// WHEN users.status = 'offline' THEN 2
+// END, users.created_at ASC;
+// `;

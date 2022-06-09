@@ -1,5 +1,10 @@
 import { RequestHandler } from 'express';
-import { addToFriendsService, getFriendsService, removeFromFriendsService } from 'modules/friends/services';
+import {
+  addToFriendsService,
+  getFriendsService,
+  getFriendsUsersService,
+  removeFromFriendsService,
+} from 'modules/friends/services';
 import { getInvitationsService } from 'modules/invitations/services';
 
 /**
@@ -48,6 +53,21 @@ export const getFriendsController: RequestHandler = async (req, res, next) => {
 
     // NOTE: Отправка списка друзей
     return res.status(200).json({ friends });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Controller для получения списка пользователей, которых можно добавить в друзья.
+ */
+export const getFriendsUsersController: RequestHandler = async (req, res, next) => {
+  try {
+    // NOTE: Список пользователей, которых можно добавить в друзья
+    const { friends_users } = await getFriendsUsersService({ user_id: (req as any).user.id });
+
+    // NOTE: Отправка списка пользователей
+    return res.status(200).json({ friends_users });
   } catch (error) {
     next(error);
   }
