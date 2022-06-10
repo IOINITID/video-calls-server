@@ -180,14 +180,27 @@ export const getFriendsUsersService = async (payload: { user_id: string }) => {
     // NOTE: Список пользователей, которых можно добавить в друзья
     const friendsUsers = await pool.query(
       `
-SELECT users.*, invitations.sent_invitation, friends.add_to_friends FROM users LEFT JOIN (
-  SELECT *, CASE
-  WHEN sent_invitation_id IS NOT NULL THEN true
-  ELSE false
-  END AS sent_invitation FROM invitations
+SELECT users.*, sent_invitations.sent_invitation, received_invitations.received_invitation, friends.add_to_friends FROM users
+
+LEFT JOIN (
+  SELECT *, CASE 
+  WHEN sent_invitation_id IS NOT NULL THEN true 
+  ELSE false 
+  END AS sent_invitation 
+  FROM invitations
   WHERE user_id = $1
-) AS invitations 
-ON users.id = invitations.sent_invitation_id 
+) AS sent_invitations 
+ON users.id = sent_invitations.sent_invitation_id
+
+LEFT JOIN (
+  SELECT *, CASE 
+  WHEN received_invitation_id IS NOT NULL THEN true 
+  ELSE false 
+  END AS received_invitation
+  FROM invitations
+  WHERE user_id = $1
+) AS received_invitations 
+ON users.id = received_invitations.received_invitation_id
 
 LEFT JOIN (
   SELECT *, CASE
