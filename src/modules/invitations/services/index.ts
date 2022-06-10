@@ -112,6 +112,15 @@ export const declineInvitationService = async (payload: { user_id: string; frien
     // NOTE: Удаление пользователя которому отправлено приглашение в друзья у пользователя который отправил приглашение в друзья
     await pool.query('DELETE FROM invitations WHERE user_id = $1 AND sent_invitation_id = $2', [friend_id, user_id]);
 
+    // NOTE: Удаление пользователя которому отправлено приглашение в друзья у пользователя который отправил приглашение в друзья
+    await pool.query('DELETE FROM invitations WHERE user_id = $1 AND received_invitation_id = $2', [
+      friend_id,
+      user_id,
+    ]);
+
+    // NOTE: Удаление пользователя который отправил приглашение в друзья у пользователя которому отправлено приглашение в друзья
+    await pool.query('DELETE FROM invitations WHERE user_id = $1 AND sent_invitation_id = $2', [user_id, friend_id]);
+
     // NOTE: Удаление пользователя который отправил приглашение в друзья у пользователя которому отправлено приглашение в друзья
     await pool.query('DELETE FROM invitations WHERE user_id = $1 AND received_invitation_id = $2', [
       user_id,
