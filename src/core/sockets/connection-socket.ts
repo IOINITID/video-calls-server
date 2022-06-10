@@ -10,13 +10,13 @@ import {
   connectSocket,
   userDisconnectSocket,
   onMessageSocket,
-  onRemoveFromFriendsSocket,
+  removeFromFriendsSocket,
   declineInvitationSocket,
 } from './index';
 
 // CONNECT - событие подключения к сокету
 const connectionSocket = (io: Server, socket: Socket) => {
-  // TODO: Доабвить отделый сокет
+  // TODO: Доабавить отдельный сокет
   socket.on('client:ping', (timestamp: string) => {
     socket.emit('server:ping', timestamp);
   });
@@ -36,8 +36,8 @@ const connectionSocket = (io: Server, socket: Socket) => {
   // ADD-TO-FRIENDS - (кастомное событие) - событие добавления в друзья
   addToFriendsSocket(io, socket);
 
-  // ON-REMOVE-FROM-FRIENDS - (кастомное событие) - событие удаление пользователя из друзей
-  onRemoveFromFriendsSocket(io, socket);
+  // REMOVE-FROM-FRIENDS - (кастомное событие) - событие удаление пользователя из друзей
+  removeFromFriendsSocket(io, socket);
 
   // DECLINE-INVITATION-SOCKET - (кастомное событие) - событие отклонения приглашения в друзья
   declineInvitationSocket(io, socket);
