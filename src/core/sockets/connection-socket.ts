@@ -1,3 +1,5 @@
+import { ApiError } from 'core/exeptions';
+import { pool } from 'core/utils';
 import { Server, Socket } from 'socket.io';
 import {
   disconnectSocket,
@@ -16,6 +18,61 @@ import {
 
 // CONNECT - событие подключения к сокету
 const connectionSocket = (io: Server, socket: Socket) => {
+  socket.on('client:meet_start_call', async (friend_id: string) => {
+    const friend = await pool.query('SELECT * FROM users WHERE id = $1', [friend_id]);
+
+    if (!friend) {
+      throw ApiError.BadRequest('Пользователь которому звонят не найден.');
+    }
+
+    socket.emit('server:meet_start_call');
+    socket.to(friend.rows[0].socket_id).emit('server:meet_start_call');
+  });
+
+  socket.on('client:meet_end_call', async (friend_id: string) => {
+    const friend = await pool.query('SELECT * FROM users WHERE id = $1', [friend_id]);
+
+    if (!friend) {
+      throw ApiError.BadRequest('Пользователь которому заканчивают вызов не найден.');
+    }
+
+    socket.emit('server:meet_end_call');
+    socket.to(friend.rows[0].socket_id).emit('server:meet_end_call');
+  });
+
+  socket.on('client:meet_offer', async (friend_id: string, offer: RTCSessionDescriptionInit) => {
+    const friend = await pool.query('SELECT * FROM users WHERE id = $1', [friend_id]);
+
+    if (!friend) {
+      throw ApiError.BadRequest('Пользователь которому заканчивают вызов не найден.');
+    }
+
+    socket.emit('server:meet_offer', offer);
+    socket.to(friend.rows[0].socket_id).emit('server:meet_offer', offer);
+  });
+
+  socket.on('client:meet_answer', async (friend_id: string, answer: RTCSessionDescriptionInit) => {
+    const friend = await pool.query('SELECT * FROM users WHERE id = $1', [friend_id]);
+
+    if (!friend) {
+      throw ApiError.BadRequest('Пользователь которому заканчивают вызов не найден.');
+    }
+
+    socket.emit('server:meet_answer', answer);
+    socket.to(friend.rows[0].socket_id).emit('server:meet_answer', answer);
+  });
+
+  socket.on('client:meet_candidate', async (friend_id: string, candidate: RTCIceCandidate) => {
+    const friend = await pool.query('SELECT * FROM users WHERE id = $1', [friend_id]);
+
+    if (!friend) {
+      throw ApiError.BadRequest('Пользователь которому заканчивают вызов не найден.');
+    }
+
+    socket.emit('server:meet_candidate', candidate);
+    socket.to(friend.rows[0].socket_id).emit('server:meet_candidate', candidate);
+  });
+
   // TODO: Доабавить отдельный сокет
   socket.on('client:ping', (timestamp: string) => {
     socket.emit('server:ping', timestamp);
