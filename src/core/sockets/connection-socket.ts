@@ -47,7 +47,7 @@ const connectionSocket = (io: Server, socket: Socket) => {
       throw ApiError.BadRequest('Пользователь которому заканчивают вызов не найден.');
     }
 
-    socket.emit('server:meet_offer', offer);
+    // socket.emit('server:meet_offer', offer);
     socket.to(friend.rows[0].socket_id).emit('server:meet_offer', offer);
   });
 
@@ -58,7 +58,7 @@ const connectionSocket = (io: Server, socket: Socket) => {
       throw ApiError.BadRequest('Пользователь которому заканчивают вызов не найден.');
     }
 
-    socket.emit('server:meet_answer', answer);
+    // socket.emit('server:meet_answer', answer);
     socket.to(friend.rows[0].socket_id).emit('server:meet_answer', answer);
   });
 
@@ -69,7 +69,7 @@ const connectionSocket = (io: Server, socket: Socket) => {
       throw ApiError.BadRequest('Пользователь которому заканчивают вызов не найден.');
     }
 
-    socket.emit('server:meet_candidate', candidate);
+    // socket.emit('server:meet_candidate', candidate);
     socket.to(friend.rows[0].socket_id).emit('server:meet_candidate', candidate);
   });
 
