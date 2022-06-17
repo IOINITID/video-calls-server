@@ -18,28 +18,34 @@ import {
 
 // CONNECT - событие подключения к сокету
 const connectionSocket = (io: Server, socket: Socket) => {
-  socket.on('client:meet_start_call', async () => {
-    // const friend = await pool.query('SELECT * FROM users WHERE id = $1', [friend_id]);
+  socket.on('client:meet_start_call', async (user_id: string, friend_id: string) => {
+    const user = await pool.query('SELECT * FROM users WHERE id = $1', [user_id]);
 
-    // if (!friend) {
-    //   throw ApiError.BadRequest('Пользователь которому звонят не найден.');
-    // }
+    if (!user) {
+      throw ApiError.BadRequest('Пользователь которому звонят не найден.');
+    }
+
+    const friend = await pool.query('SELECT * FROM users WHERE id = $1', [friend_id]);
+
+    if (!friend) {
+      throw ApiError.BadRequest('Пользователь которому звонят не найден.');
+    }
 
     // socket.emit('server:meet_start_call');
-    // socket.to(friend.rows[0].socket_id).emit('server:meet_start_call');
-    io.emit('server:meet_start_call');
+    socket.to(friend.rows[0].socket_id).emit('server:meet_start_call', user.rows[0]);
+    // io.emit('server:meet_start_call');
   });
 
-  socket.on('client:meet_end_call', async () => {
-    // const friend = await pool.query('SELECT * FROM users WHERE id = $1', [friend_id]);
+  socket.on('client:meet_end_call', async (friend_id: string) => {
+    const friend = await pool.query('SELECT * FROM users WHERE id = $1', [friend_id]);
 
-    // if (!friend) {
-    //   throw ApiError.BadRequest('Пользователь которому заканчивают вызов не найден.');
-    // }
+    if (!friend) {
+      throw ApiError.BadRequest('Пользователь которому заканчивают вызов не найден.');
+    }
 
     // socket.emit('server:meet_end_call');
-    // socket.to(friend.rows[0].socket_id).emit('server:meet_end_call');
-    io.emit('server:meet_end_call');
+    socket.to(friend.rows[0].socket_id).emit('server:meet_end_call');
+    // io.emit('server:meet_end_call');
   });
 
   socket.on('client:meet_offer', async (user_id: string, friend_id: string, offer: RTCSessionDescriptionInit) => {
