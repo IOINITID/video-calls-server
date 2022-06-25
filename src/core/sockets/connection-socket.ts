@@ -18,22 +18,40 @@ import {
 
 // CONNECT - событие подключения к сокету
 const connectionSocket = (io: Server, socket: Socket) => {
-  socket.on('client:meet_start_call', async (user_id: string, friend_id: string) => {
-    const user = await pool.query('SELECT * FROM users WHERE id = $1', [user_id]);
+  // user_id: string, friend_id: string
+  socket.on('client:meet_start_call', async (payload: { userFromCall: string; userToCall: string }) => {
+    const userFromCall = await pool.query('SELECT * FROM users WHERE id = $1', [payload.userFromCall]);
 
-    if (!user) {
-      throw ApiError.BadRequest('Пользователь которому звонят не найден.');
+    if (!userFromCall) {
+      throw ApiError.BadRequest('Пользователь который звонит не найден.');
     }
 
-    const friend = await pool.query('SELECT * FROM users WHERE id = $1', [friend_id]);
+    const userToCall = await pool.query('SELECT * FROM users WHERE id = $1', [payload.userToCall]);
 
-    if (!friend) {
+    if (!userToCall) {
       throw ApiError.BadRequest('Пользователь которому звонят не найден.');
     }
 
     // socket.emit('server:meet_start_call');
-    socket.to(friend.rows[0].socket_id).emit('server:meet_start_call', user.rows[0]);
+    socket.to(userToCall.rows[0].socket_id).emit('server:meet_start_call', { userFromCall: userFromCall.rows[0] });
     // io.emit('server:meet_start_call');
+  });
+
+  socket.on('client:meet_accept_call', async (payload: { userFromCall: string; userToCall: string }) => {
+    const userFromCall = await pool.query('SELECT * FROM users WHERE id = $1', [payload.userFromCall]);
+
+    if (!userFromCall) {
+      throw ApiError.BadRequest('Пользователь который звонит не найден.');
+    }
+
+    const userToCall = await pool.query('SELECT * FROM users WHERE id = $1', [payload.userToCall]);
+
+    if (!userToCall) {
+      throw ApiError.BadRequest('Пользователь которому звонят не найден.');
+    }
+
+    socket.emit('server:meet_accept_call');
+    socket.to(userToCall.rows[0].socket_id).emit('server:meet_accept_call');
   });
 
   socket.on('client:meet_end_call', async (friend_id: string) => {
@@ -48,17 +66,22 @@ const connectionSocket = (io: Server, socket: Socket) => {
     // io.emit('server:meet_end_call');
   });
 
-  socket.on('client:meet_offer', async (user_id: string, friend_id: string, offer: RTCSessionDescriptionInit) => {
-    const friend = await pool.query('SELECT * FROM users WHERE id = $1', [friend_id]);
+  socket.on(
+    'client:meet_offer',
+    async (payload: { userFromCall: string; userToCall: string }, offer: RTCSessionDescriptionInit) => {
+      const userToCall = await pool.query('SELECT * FROM users WHERE id = $1', [payload.userToCall]);
 
-    if (!friend) {
-      throw ApiError.BadRequest('Пользователь которому отправляют предложение для peer соединения не найден.');
+      if (!userToCall) {
+        throw ApiError.BadRequest('Пользователь которому отправляют предложение для peer соединения не найден.');
+      }
+
+      // socket.emit('server:meet_offer', offer);
+      socket
+        .to(userToCall.rows[0].socket_id)
+        .emit('server:meet_offer', { userFromCall: payload.userFromCall, userToCall: payload.userToCall }, offer);
+      // io.emit('server:meet_offer', offer);
     }
-
-    // socket.emit('server:meet_offer', offer);
-    socket.to(friend.rows[0].socket_id).emit('server:meet_offer', user_id, friend_id, offer);
-    // io.emit('server:meet_offer', offer);
-  });
+  );
 
   socket.on('client:meet_answer', async (user_id: string, friend_id: string, answer: RTCSessionDescriptionInit) => {
     const friend = await pool.query('SELECT * FROM users WHERE id = $1', [friend_id]);
