@@ -1,5 +1,6 @@
 import { ApiError } from 'core/exeptions';
 import { pool } from 'core/utils';
+import { UserModel } from 'modules/user/models/user-model';
 import { Server, Socket } from 'socket.io';
 import {
   disconnectSocket,
@@ -106,6 +107,25 @@ const connectionSocket = (io: Server, socket: Socket) => {
     socket.to(friend.rows[0].socket_id).emit('server:meet_candidate', user_id, friend_id, candidate);
     // io.emit('server:meet_candidate', candidate);
   });
+
+  socket.on(
+    'client:media_state_change',
+    async (payload: { media: { audio: boolean; video: boolean }; userFromCall: UserModel; userToCall: UserModel }) => {
+      const userToCall = await pool.query('SELECT * FROM users WHERE id = $1', [payload.userToCall.id]);
+
+      if (!userToCall) {
+        throw ApiError.BadRequest('Пользователь которому отправляют предложение для peer соединения не найден.');
+      }
+
+      // socket.emit('server:meet_offer', offer);
+      socket.to(userToCall.rows[0].socket_id).emit('server:media_state_change', {
+        media: payload.media,
+        userFromCall: payload.userFromCall,
+        userToCall: payload.userToCall,
+      });
+      // io.emit('server:meet_offer', offer);
+    }
+  );
 
   // TODO: Доабавить отдельный сокет
   socket.on('client:ping', (timestamp: string) => {
